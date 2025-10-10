@@ -1,0 +1,15 @@
+# uv project ignore rules
+uv_cache/
+assets/**/*.png
+assets/**/*.jpg
+assets/**/*.jpeg
+assets/**/*.gif
+assets/**/*.webp
+.env
+.env.*
+__pycache__/
+*.pyc
+.venv
+.DS_Store
+Thumbs.db
+logs/

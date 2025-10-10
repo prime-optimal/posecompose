@@ -94,6 +94,9 @@ All other scripts wrap these core tasks.
      * Impact assessment and next steps
    - Commit with descriptive messages and open a pull request.
 
+### Phase Log
+- **Subphase 4 – AI Provider Abstraction (Completed Oct 10, 2025)**: Seeded the Neon catalog with production costume assets via Bun/Postgres scripts, stood up a Bun API server backed by Neon, and refactored the frontend catalog flow to fetch live data with fallbacks. Lint/typecheck passed; NanoGPT live test suite now requires additional timeouts for `seedream-v4`.
+
 ## Git Workflow Essentials
 1. Branch from `main` using a descriptive slug: `feature/<slug>` or `bugfix/<slug>`.
 2. Run `bunx tsc --noEmit && bun run lint` locally **before** committing.

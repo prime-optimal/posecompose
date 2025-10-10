@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { HALLOWEEN_COSTUMES, getFeaturedCostumes, getCostumeById } from '@/data/costumes';
+import { HALLOWEEN_COSTUMES } from '@/data/costumes';
+import { fetchCostumes } from '@/services/costume-service';
 import { CostumePreset } from '@/types/costume';
 import { logEvent } from '@/lib/logger';
 import { toast } from 'sonner';
@@ -14,12 +15,49 @@ interface CostumeSelectionProps {
 }
 
 export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: CostumeSelectionProps) => {
+  const [costumes, setCostumes] = useState<CostumePreset[]>(HALLOWEEN_COSTUMES);
+  const [loadingCostumes, setLoadingCostumes] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeCostume, setActiveCostume] = useState<string | null>(
     selectedCostume?.id || null
   );
-  
-  const featuredCostumes = getFeaturedCostumes();
-  const allCostumes = HALLOWEEN_COSTUMES;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCostumes = async () => {
+      try {
+        setLoadingCostumes(true);
+        const apiCostumes = await fetchCostumes();
+        if (!isMounted) return;
+        setCostumes(apiCostumes);
+        setLoadError(null);
+      } catch (error) {
+        console.error('Failed to fetch costumes from Neon API:', error);
+        if (!isMounted) return;
+        setCostumes(HALLOWEEN_COSTUMES);
+        setLoadError('Unable to reach Neon catalog. Showing fallback costumes.');
+        toast.error('Unable to reach Neon catalog. Showing fallback costumes.');
+      } finally {
+        if (isMounted) {
+          setLoadingCostumes(false);
+        }
+      }
+    };
+
+    void loadCostumes();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const featuredCostumes = useMemo(
+    () => costumes.filter(costume => costume.isFeatured),
+    [costumes]
+  );
+
+  const allCostumes = useMemo(() => costumes, [costumes]);
 
   const handleCostumeSelect = (costume: CostumePreset) => {
     setActiveCostume(costume.id);
@@ -34,7 +72,10 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
 
   const handleContinue = () => {
     if (activeCostume) {
-      const costume = getCostumeById(activeCostume);
+      const costume =
+        costumes.find(item => item.id === activeCostume) ??
+        HALLOWEEN_COSTUMES.find(item => item.id === activeCostume) ??
+        null;
       if (costume) {
         onCostumeSelect(costume);
         toast.success(`${costume.name} costume ready! Now upload your selfie.`);
@@ -117,6 +158,18 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
           <span className="font-medium">Limited Edition Halloween Collection</span>
         </div>
       </div>
+
+      {loadingCostumes && (
+        <div className="rounded-md border border-dashed border-purple-200 bg-purple-50/50 p-3 text-sm text-purple-700">
+          Loading costumes from Neon catalog...
+        </div>
+      )}
+
+      {loadError && !loadingCostumes && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          {loadError}
+        </div>
+      )}
 
       {/* Featured Costumes */}
       <div className="space-y-4">
