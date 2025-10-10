@@ -27,6 +27,7 @@ const CostumeTransformationFlow = () => {
   const [currentStep, setCurrentStep] = useState<TransformStep['current']>('costume');
   const [uploadedSelfie, setUploadedSelfie] = useState<File | null>(null);
   const [selfieUrl, setSelfieUrl] = useState<string | null>(null);
+  const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -128,6 +129,7 @@ const CostumeTransformationFlow = () => {
       
       setUploadedSelfie(file);
       setSelfieUrl(url);
+      setSelfieBase64(base64);
       
       logInfo('selfie_uploaded', {
         fileName: file.name,
@@ -137,6 +139,12 @@ const CostumeTransformationFlow = () => {
       });
 
       // Immediately start generation after upload
+      transformationStartRef.current = now();
+      logInfo('generation_started', {
+        costumeId: selectedCostume.id,
+        costumeName: selectedCostume.name,
+        referenceCount: selectedCostume.assets.length,
+      });
       setCurrentStep('generating');
       toast.success('Selfie uploaded! Starting your magical transformation...');
       
@@ -182,6 +190,7 @@ const CostumeTransformationFlow = () => {
     setCurrentStep('costume');
     setUploadedSelfie(null);
     setSelfieUrl(null);
+    setSelfieBase64(null);
     setGeneratedImage(null);
     setIsProcessing(false);
     startSession("restart");
@@ -198,6 +207,7 @@ const CostumeTransformationFlow = () => {
     setCurrentStep('costume');
     setUploadedSelfie(null);
     setSelfieUrl(null);
+    setSelfieBase64(null);
     setGeneratedImage(null);
   };
 
@@ -339,6 +349,8 @@ const CostumeTransformationFlow = () => {
           <GenerationLounge
             selectedCostume={selectedCostume}
             userEmail={userEmail}
+            selfieBase64={selfieBase64}
+            uploadedSelfie={uploadedSelfie}
             onComplete={handleGenerationComplete}
           />
         );

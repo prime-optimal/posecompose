@@ -1,195 +1,428 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Zap, Sparkles, Image, Wand2, Gift, Star } from 'lucide-react';
-import { CostumePreset } from '@/types/costume';
-import { logEvent } from '@/lib/logger';
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import {
+	Zap,
+	Sparkles,
+	Image,
+	Wand2,
+	Gift,
+	Star,
+	AlertTriangle,
+	Loader2,
+} from 'lucide-react'
+import { CostumePreset } from '@/types/costume'
+import { logEvent, logError } from '@/lib/logger'
+import { NanoGptProvider, type NanoGptModel, buildNanoGptReferences } from '@/lib/ai'
 
 interface GenerationLoungeProps {
-  selectedCostume: CostumePreset;
-  userEmail?: string;
-  onComplete: (imageUrl: string) => void;
+  selectedCostume: CostumePreset
+  userEmail?: string
+  selfieBase64?: string | null
+  uploadedSelfie?: File | null
+  onComplete: (imageUrl: string) => void
 }
 
 interface GenerationProgress {
-  stage: string;
-  progress: number;
-  message: string;
-  icon: React.ReactNode;
+  stage: string
+  progress: number
+  message: string
+  icon: React.ReactNode
 }
 
-export const GenerationLounge = ({ selectedCostume, userEmail, onComplete }: GenerationLoungeProps) => {
-  const [currentStage, setCurrentStage] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [estimatedTime, setEstimatedTime] = useState(selectedCostume.metadata.estimatedProcessingTime);
+const SUPPORTED_MODELS: NanoGptModel[] = ['seedream-v4', 'google:4@1', 'background-remover']
 
-  const stages: GenerationProgress[] = useMemo(() => [
-    {
-      stage: 'Upload',
-      progress: 20,
-      message: 'Analyzing your selfie...',
-      icon: <Image className="w-4 h-4" />
-    },
-    {
-      stage: 'Background',
-      progress: 40,
-      message: 'Removing background with AI magic...',
-      icon: <Zap className="w-4 h-4" />
-    },
-    {
-      stage: 'Costume',
-      progress: 70,
-      message: 'Applying ' + selectedCostume.name + ' transformation...',
-      icon: <Wand2 className="w-4 h-4" />
-    },
-    {
-      stage: 'Polish',
-      progress: 90,
-      message: 'Adding magical touches...',
-      icon: <Sparkles className="w-4 h-4" />
-    },
-    {
-      stage: 'Complete',
-      progress: 100,
-      message: 'Your transformation is ready!',
-      icon: <Star className="w-4 h-4" />
-    }
-  ], [selectedCostume.name]);
+const getDefaultNanoGptModel = (): NanoGptModel => {
+	const envModel = import.meta.env.VITE_DEFAULT_MODEL
+	if (envModel && SUPPORTED_MODELS.includes(envModel as NanoGptModel)) {
+		return envModel as NanoGptModel
+	}
+	return 'seedream-v4'
+}
 
-  useEffect(() => {
-    logEvent('generation_lounge_entered', {
-      costumeId: selectedCostume.id,
-      costumeName: selectedCostume.name,
-      userEmail: userEmail || 'guest'
-    });
+const buildPromptFromCostume = (costume: CostumePreset) => {
+	const { transformation } = costume
+	const primaryParts = [transformation.base]
+	const variation = transformation.variations?.[0]?.prompt
+	if (variation) {
+		primaryParts.push(variation)
+	}
+	if (transformation.qualityModifiers?.length) {
+		primaryParts.push(transformation.qualityModifiers.join(', '))
+	}
+	if (transformation.detailEnhancements?.length) {
+		primaryParts.push(`detail: ${transformation.detailEnhancements.join(', ')}`)
+	}
+	return primaryParts.filter(Boolean).join('. ')
+}
 
-    // Simulate generation progress
-    const totalDuration = estimatedTime * 1000; // Convert to milliseconds
-    const stageDuration = totalDuration / stages.length;
-    
-    stages.forEach((stage, index) => {
-      setTimeout(() => {
-        setCurrentStage(index);
-        setProgress(stage.progress);
-        logEvent('generation_stage_updated', {
-          stage: stage.stage,
-          progress: stage.progress,
-          costumeId: selectedCostume.id
-        });
+type GenerationStatus = 'idle' | 'running' | 'error' | 'success' | 'config-missing'
 
-        // If this is the final stage, simulate completion
-        if (index === stages.length - 1) {
-          setTimeout(() => {
-            // In a real implementation, this would receive the actual generated image
-            const mockGeneratedImage = `data:image/svg+xml,%3Csvg width='400' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23${selectedCostume.colors.primary.substring(1)}' width='400' height='600'/%3E%3Ctext x='200' y='300' text-anchor='middle' fill='white' font-family='Arial' font-size='24'${selectedCostume.name} Transformation%3C/text%3E%3C/svg%3E`;
-            
-            logEvent('generation_completed', {
-              costumeId: selectedCostume.id,
-              costumeName: selectedCostume.name,
-              durationMs: estimatedTime * 1000,
-              userEmail: userEmail || 'guest'
-            });
-            
-            onComplete(mockGeneratedImage);
-          }, stageDuration);
-        }
-      }, index * stageDuration);
-    });
+export const GenerationLounge = ({
+	selectedCostume,
+	userEmail,
+	selfieBase64,
+	uploadedSelfie,
+	onComplete,
+}: GenerationLoungeProps) => {
+	const provider = useMemo(() => new NanoGptProvider(), [])
+	const [status, setStatus] = useState<GenerationStatus>('idle')
+	const [attempt, setAttempt] = useState(0)
+	const [currentStage, setCurrentStage] = useState(0)
+	const [progress, setProgress] = useState(5)
+	const [estimatedTime, setEstimatedTime] = useState(
+		selectedCostume.metadata.estimatedProcessingTime,
+	)
+	const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-    // Update countdown timer
-    const timeInterval = setInterval(() => {
-      setEstimatedTime(prev => Math.max(0, prev - 1));
-    }, 1000);
+	const stages: GenerationProgress[] = useMemo(
+		() => [
+			{
+				stage: 'References',
+				progress: 10,
+				message: 'Preparing costume references...',
+				icon: <Image className="w-4 h-4" />,
+			},
+			{
+				stage: 'Upload',
+				progress: 35,
+				message: 'Sending your selfie to the Nano GPT atelier...',
+				icon: <Zap className="w-4 h-4" />,
+			},
+			{
+				stage: 'Generation',
+				progress: 70,
+				message: `Weaving the ${selectedCostume.name} look...`,
+				icon: <Wand2 className="w-4 h-4" />,
+			},
+			{
+				stage: 'Polish',
+				progress: 90,
+				message: 'Adding finishing sparkles...',
+				icon: <Sparkles className="w-4 h-4" />,
+			},
+			{
+				stage: 'Complete',
+				progress: 100,
+				message: 'Your transformation is ready!',
+				icon: <Star className="w-4 h-4" />,
+			},
+		],
+		[selectedCostume.name],
+	)
 
-    return () => clearInterval(timeInterval);
-  }, [selectedCostume, userEmail, estimatedTime, onComplete, stages]);
+	useEffect(() => {
+		logEvent('generation_lounge_entered', {
+			costumeId: selectedCostume.id,
+			costumeName: selectedCostume.name,
+			userEmail: userEmail || 'guest',
+		})
+	}, [selectedCostume.id, selectedCostume.name, userEmail])
 
-  const activeStage = stages[currentStage];
+	useEffect(() => {
+	setEstimatedTime(selectedCostume.metadata.estimatedProcessingTime)
+	setProgress(5)
+	setCurrentStage(0)
+}, [selectedCostume.id, attempt, selectedCostume.metadata.estimatedProcessingTime])
 
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
+	useEffect(() => {
+		if (status !== 'running') {
+			return
+		}
+
+		const interval = setInterval(() => {
+			setProgress(prev => {
+				const target = stages[stages.length - 2]?.progress ?? 90
+				if (prev >= target) {
+					return prev
+				}
+				return Math.min(target, prev + 3)
+			})
+		}, 900)
+
+		return () => clearInterval(interval)
+	}, [status, stages])
+
+	useEffect(() => {
+		const thresholdIndex = stages.findIndex(stage => progress < stage.progress)
+		const nextStage =
+			thresholdIndex === -1
+				? stages.length - 1
+				: Math.max(0, thresholdIndex - 1)
+
+		setCurrentStage(prev => (prev === nextStage ? prev : nextStage))
+	}, [progress, stages])
+
+	useEffect(() => {
+		if (status !== 'running') {
+			return
+		}
+		const timer = setInterval(() => {
+			setEstimatedTime(prev => (prev > 0 ? prev - 1 : 0))
+		}, 1000)
+		return () => clearInterval(timer)
+	}, [status])
+
+	useEffect(() => {
+		if (!provider.isConfigured()) {
+			setStatus('config-missing')
+			return
+		}
+
+		let isCancelled = false
+		const model = getDefaultNanoGptModel()
+
+		const executeGeneration = async () => {
+			setStatus('running')
+			setErrorMessage(null)
+			setProgress(10)
+
+			try {
+		const references = buildNanoGptReferences({
+			costume: selectedCostume,
+			model,
+			selfieBase64,
+			selfieMimeType: uploadedSelfie?.type ?? null,
+			includeFallback: model !== 'background-remover',
+		})
+
+				if (!references.length) {
+					throw new Error('No reference assets available for Nano GPT request')
+				}
+
+				const prompt = buildPromptFromCostume(selectedCostume)
+				const negativePrompt = selectedCostume.transformation.negativePrompts?.join(', ')
+
+				logEvent('generation_request_dispatched', {
+					costumeId: selectedCostume.id,
+					model,
+					references: references.length,
+					attempt,
+				})
+
+			const response = await provider.generateImage({
+				model,
+				prompt,
+				references,
+				negativePrompt,
+			})
+
+				if (isCancelled) {
+					return
+				}
+
+				const primaryImage = response.images[0]
+				if (!primaryImage) {
+					throw new Error('Nano GPT did not return any images')
+				}
+
+				const imageUrl = primaryImage.base64
+					? `data:image/png;base64,${primaryImage.base64}`
+					: primaryImage.url
+
+				if (!imageUrl) {
+					throw new Error('Nano GPT response missing usable image data')
+				}
+
+				setProgress(100)
+				setStatus('success')
+				setCurrentStage(stages.length - 1)
+
+				logEvent('generation_completed', {
+					costumeId: selectedCostume.id,
+					costumeName: selectedCostume.name,
+					model,
+					referenceCount: references.length,
+					attempt,
+				})
+
+				onComplete(imageUrl)
+			} catch (error) {
+				if (isCancelled) {
+					return
+				}
+
+				const message =
+					error instanceof Error
+						? error.message
+						: 'Unexpected error while generating your transformation'
+
+				setStatus('error')
+				setErrorMessage(message)
+				logError('generation_failed', error, {
+					costumeId: selectedCostume.id,
+					model,
+					attempt,
+					references: selfieBase64 ? 'selfie+catalog' : 'catalog-only',
+				})
+				toast.error('Aw, the magic fizzled. Try again in a moment!')
+			}
+		}
+
+		executeGeneration()
+
+		return () => {
+			isCancelled = true
+		}
+	}, [attempt, onComplete, provider, selectedCostume, selfieBase64, stages.length, uploadedSelfie])
+
+	useEffect(() => {
+	const stage = stages[currentStage]
+	if (!stage || status === 'config-missing') {
+		return
+	}
+
+		logEvent('generation_stage_updated', {
+			stage: stage.stage,
+			progress,
+			costumeId: selectedCostume.id,
+			status,
+		})
+	}, [currentStage, stages, progress, selectedCostume.id, status])
+
+	const handleRetry = useCallback(() => {
+		logEvent('generation_retry_requested', {
+			costumeId: selectedCostume.id,
+			attempt: attempt + 1,
+		})
+		setProgress(5)
+		setCurrentStage(0)
+		setEstimatedTime(selectedCostume.metadata.estimatedProcessingTime)
+		setAttempt(prev => prev + 1)
+	}, [attempt, selectedCostume.id, selectedCostume.metadata.estimatedProcessingTime])
+
+	return (
+		<div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="flex justify-center">
-          <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full animate-pulse">
-            <Wand2 className="w-8 h-8 text-white" />
-          </div>
-        </div>
-        
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold gradient-text">
-            Magic in Progress ✨
-          </h2>
-          <p className="text-muted-foreground">
-            Transforming into {selectedCostume.name}...
-          </p>
-        </div>
+			<div className="text-center space-y-2">
+				<div className="flex justify-center">
+					<div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full animate-pulse">
+						<Wand2 className="w-8 h-8 text-white" />
+					</div>
+				</div>
+				
+				<div className="space-y-1">
+					<h2 className="text-2xl font-bold gradient-text">
+						Magic in Progress ✨
+					</h2>
+					<p className="text-muted-foreground">
+						{status === 'config-missing'
+							? 'Add your Nano GPT credentials to continue your transformation'
+							: `Transforming into ${selectedCostume.name}...`}
+					</p>
+				</div>
 
-        <div className="flex items-center justify-center gap-2">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm text-muted-foreground">
-              {estimatedTime}s remaining
-            </span>
-          </div>
-        </div>
+				<div className="flex items-center justify-center gap-2">
+					{status === 'running' && (
+						<div className="flex items-center gap-1">
+							<Loader2 className="w-4 h-4 text-primary animate-spin" />
+							<span className="text-sm text-muted-foreground">
+								{estimatedTime}s remaining
+							</span>
+						</div>
+					)}
+
+					{status === 'config-missing' && (
+						<div className="flex items-center gap-1 text-amber-700">
+							<AlertTriangle className="w-4 h-4" />
+							<span className="text-sm">API key required</span>
+						</div>
+					)}
+				</div>
       </div>
 
       {/* Progress */}
       <Card className="p-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Transformation Progress</span>
-              <span className="text-sm text-muted-foreground">{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-
-          {/* Stages */}
-          <div className="space-y-3">
-            {stages.map((stage, index) => (
-              <div
-                key={stage.stage}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                  index <= currentStage
-                    ? index === currentStage
-                      ? 'bg-primary/10 border border-primary/25'
-                      : 'bg-muted/50'
-                    : 'opacity-50'
-                }`}
-              >
-                <div className={`p-2 rounded-full ${
-                  index <= currentStage
-                    ? index === currentStage
-                      ? 'bg-primary animate-pulse'
-                      : 'bg-primary/50'
-                    : 'bg-muted'
-                }`}>
-                  {stage.icon}
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className={`font-medium ${
-                      index <= currentStage ? 'text-foreground' : 'text-muted-foreground'
-                    }`}>
-                      {stage.stage}
-                    </span>
-                    {index <= currentStage && (
-                      <span className="text-xs text-muted-foreground">
-                        {stage.progress}%
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {stage.message}
-                  </p>
-                </div>
+          {status !== 'config-missing' && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Transformation Progress</span>
+                <span className="text-sm text-muted-foreground">{progress}%</span>
               </div>
-            ))}
-          </div>
+              <Progress value={progress} className="h-2" />
+            </div>
+          )}
+
+          {status === 'config-missing' && (
+            <div className="flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-left">
+              <AlertTriangle className="w-5 h-5 text-amber-700" />
+              <div className="space-y-1 text-sm text-amber-800">
+                <p className="font-medium">Nano GPT configuration required</p>
+                <p>
+                  Add <code className="font-mono">VITE_NANO_GPT_API_KEY</code>
+                  {" "}and optionally <code className="font-mono">VITE_NANO_GPT_BASE_URL</code> to
+                  enable live transformations. Fallback mock assets will be used until
+                  configured.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {status !== 'config-missing' && (
+            <div className="space-y-3">
+              {stages.map((stage, index) => (
+                <div
+                  key={stage.stage}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
+                    index <= currentStage
+                      ? index === currentStage
+                        ? 'bg-primary/10 border border-primary/25'
+                        : 'bg-muted/50'
+                      : 'opacity-50'
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-full ${
+                      index <= currentStage
+                        ? index === currentStage
+                          ? 'bg-primary animate-pulse'
+                          : 'bg-primary/50'
+                        : 'bg-muted'
+                    }`}
+                  >
+                    {stage.icon}
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`font-medium ${
+                          index <= currentStage ? 'text-foreground' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {stage.stage}
+                      </span>
+                      {index <= currentStage && (
+                        <span className="text-xs text-muted-foreground">
+                          {stage.progress}%
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {stage.message}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {status === 'error' && errorMessage && (
+            <div className="rounded-lg border border-rose-300 bg-rose-50 p-4 text-rose-800">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="font-semibold">Magic fizzled!</span>
+              </div>
+              <p className="text-sm mb-3">{errorMessage}</p>
+              <Button variant="outline" onClick={handleRetry}>
+                Try again
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
 
