@@ -3,6 +3,18 @@ Waifu Material
 
 > "Spook up your selfie." Waifu Material lets gamers, cosplayers, and egirls slip into high-fantasy Halloween costumes without leaving their chair.
 
+## 🙏 Attribution
+
+**Waifu Material is a derivative work of PoseCompose** - the original group photo generation application by **[Mert Gülşün](@setrf)**.
+
+- **Original Project**: https://github.com/setrf/posecompose
+- **Original Author**: Mert Gülşün (@setrf)
+- **Original Achievement**: 🏆 Winner – Google DeepMind Nano Banana Hackathon (Kaggle), selected from 832 submissions worldwide
+
+Waifu Material builds upon PoseCompose's excellent foundation, transforming it into a specialized costume transformation platform with enhanced target demographic focus, affiliate marketing integration, and seasonal content curation.
+
+We're grateful to Mert for creating the original PoseCompose and open-sourcing such a solid foundation!
+
 Table of Contents
 -----------------
 
