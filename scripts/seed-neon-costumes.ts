@@ -1,4 +1,4 @@
-import postgres, { Sql } from 'postgres'
+import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
 import { loadCostumePresets } from './utils/costume-loader'
 
 const slugify = (value: string) =>
@@ -21,12 +21,10 @@ const createSqlClient = () => {
 		throw new Error('NEON_DATABASE_URL is not set. Please add it to your environment before running the seed script.')
 	}
 
-	return postgres(url, {
-		ssl: 'require',
-	})
+	return neon(url)
 }
 
-const ensureTables = async (sql: Sql) => {
+const ensureTables = async (sql: NeonQueryFunction) => {
 	await sql`
 		CREATE TABLE IF NOT EXISTS costume_categories (
 			id TEXT PRIMARY KEY,
@@ -77,7 +75,7 @@ const ensureTables = async (sql: Sql) => {
 }
 
 const upsertCategories = async (
-	sql: Sql,
+	sql: NeonQueryFunction,
 	categories: Map<string, { id: string; name: string; description?: string; count: number }>,
 ) => {
 	for (const [slug, category] of categories.entries()) {
@@ -95,7 +93,7 @@ const upsertCategories = async (
 }
 
 const upsertCostume = async (
-	sql: Sql,
+	sql: NeonQueryFunction,
 	costume: Awaited<ReturnType<typeof loadCostumePresets>>[number],
 	categoryId: string,
 ) => {
@@ -127,11 +125,11 @@ const upsertCostume = async (
 			${costume.description},
 			${categoryId},
 			${costume.version},
-			${sql.json(costume.metadata)},
-			${sql.json(costume.colors)},
-			${sql.json(costume.transformation)},
-			${sql.json(costume.marketing)},
-			${sql.json(costume.affiliateLinks)},
+			${JSON.stringify(costume.metadata)}::jsonb,
+			${JSON.stringify(costume.colors)}::jsonb,
+			${JSON.stringify(costume.transformation)}::jsonb,
+			${JSON.stringify(costume.marketing)}::jsonb,
+			${JSON.stringify(costume.affiliateLinks)}::jsonb,
 			${costume.metadata.popularityScore ?? 0},
 			${costume.isActive},
 			${costume.isPremium},
@@ -230,8 +228,6 @@ const main = async () => {
 	} catch (error) {
 		console.error('Failed to seed Neon costumes:', error)
 		process.exitCode = 1
-	} finally {
-		await sql.end({ timeout: 5 })
 	}
 }
 

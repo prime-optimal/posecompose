@@ -63,7 +63,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
     "zod": "^3.25.76",
-    "postgres": "^3.4.4"
+    "@neondatabase/serverless": "^1.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",

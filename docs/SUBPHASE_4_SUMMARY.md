@@ -18,8 +18,8 @@ ai-pipeline-droid
 
 ### ✅ Technical Deliverables
 - `scripts/utils/costume-loader.ts` normalises costume JSON + assets, ensuring primary images are selected via filename heuristics (`square/profile/front`).
-- `scripts/seed-neon-costumes.ts` seeds costumes, categories, and assets into Neon using `postgres` with SSL support.
-- `server/neon-client.ts` provides typed Neon queries with graceful fallback to local data when the database is unavailable.
+- `scripts/seed-neon-costumes.ts` seeds costumes, categories, and assets into Neon using the serverless HTTP driver (`@neondatabase/serverless`).
+- `server/neon-client.ts` provides typed Neon queries via the HTTP driver with graceful fallback to local data when the database is unavailable.
 - `server/index.ts` Bun server serving JSON APIs and static costume assets with CORS controls.
 - `src/services/costume-service.ts` frontend fetch layer with API integration and fallback handling.
 - `CostumeSelection` reworked to load costumes asynchronously, surface loading/error states, and fall back to local fixtures if Neon is unreachable.
@@ -38,8 +38,8 @@ ai-pipeline-droid
 ## Challenges & Solutions
 - **Challenge**: Identifying the correct primary image per costume without manual tagging.
   **Solution**: Implemented keyword-based heuristic prioritising filenames containing `square`, `profile`, or `front`.
-- **Challenge**: Maintaining app functionality when Neon is offline.
-  **Solution**: Service layer and client utilities default to the legacy fixture set when API calls fail.
+- **Challenge**: Maintaining app functionality when Neon is offline or slow to wake from sleep.
+  **Solution**: Migrated API + seed paths to the Neon HTTP driver to bypass pooler timeouts and kept service layer fallbacks to the legacy fixture set.
 - **Challenge**: Large asset import set.
   **Solution**: Added dedicated `assets/.gitignore` and structured loader to deduplicate paths.
 
@@ -47,6 +47,12 @@ ai-pipeline-droid
 - **Live Content**: UI now reflects database-driven costume catalog updates without redeploying.
 - **Operational Readiness**: Seeding script documents the environment requirements (`NEON_DATABASE_URL`) for future content syncs.
 - **Scalability**: Backend/API structure positions the project for further catalog expansion and admin tooling in Phase 2.
+
+## Operational Notes
+- `bun run serve:api` runs `server/index.ts` and starts the Bun API on `http://localhost:4000`.
+  It uses the Neon HTTP client for database access and serves static costume assets.
+- When Neon sleeps or is unreachable the API logs a warning and falls back to local costume fixtures.
+  This keeps the UI usable while the database recovers.
 
 ## Next Steps & Follow-Ups
 - Extend test suite with Neon-backed integration coverage (mock Neon or seed fixtures).

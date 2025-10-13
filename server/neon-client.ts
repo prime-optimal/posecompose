@@ -1,11 +1,11 @@
-import postgres, { Sql } from 'postgres'
+import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
 import type { CostumeAsset, CostumePreset } from '../src/types/costume'
 import { loadCostumePresets } from '../scripts/utils/costume-loader'
 
 const connectionString =
 	process.env.NEON_DATABASE_URL_READONLY ?? process.env.NEON_DATABASE_URL ?? ''
 
-let cachedSql: Sql | null = null
+let cachedSql: NeonQueryFunction | null = null
 
 interface DBAssetRow {
 	id: string
@@ -44,9 +44,7 @@ const getSqlClient = () => {
 	}
 
 	if (!cachedSql) {
-		cachedSql = postgres(connectionString, {
-			ssl: 'require',
-		})
+		cachedSql = neon(connectionString)
 	}
 
 	return cachedSql
@@ -95,7 +93,7 @@ const mapCostumeRow = (row: DBCostumeRow, assets: CostumeAsset[]): CostumePreset
 	inspiration: row.inspiration ?? undefined,
 })
 
-const fetchAssetsForCostume = async (sql: Sql, costumeId: string) => {
+const fetchAssetsForCostume = async (sql: NeonQueryFunction, costumeId: string) => {
 	const rows = await sql<DBAssetRow[]>`
 		SELECT id, url, type, description
 		FROM costume_assets
@@ -184,7 +182,6 @@ export const getFeaturedCostumes = async (): Promise<CostumePreset[]> => {
 
 export const shutdownClient = async () => {
 	if (cachedSql) {
-		await cachedSql.end({ timeout: 5 })
 		cachedSql = null
 	}
 }

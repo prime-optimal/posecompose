@@ -23,6 +23,7 @@ Rebrand the existing experience into Waifu Material and deliver a polished Hallo
    - Support Gemini proxy + OpenAI-compatible providers (incl. `seedream-v4`). ✅
    - Handle multiple costume reference images per request. ✅
    - Provide mockable interfaces for tests. ✅
+   - Adopt Neon HTTP driver for API + seeding; local API runs with `bun run serve:api`. ✅
 
 5. **Instrumentation & Data Hooks**  _(affiliates-comms-droid + ai-pipeline-droid)_
    - Extend logging events (selection, email, generation, affiliate clicks, social shares).
