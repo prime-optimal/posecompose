@@ -289,7 +289,7 @@ export const loadCostumePresets = async (): Promise<CostumePreset[]> => {
 			description: costume.prompt,
 			version: '1.0.0',
 			assets,
-			colors: palette,
+			colors: palette!,
 			transformation: {
 				base: costume.prompt,
 				variations: [
@@ -341,7 +341,7 @@ export const loadCostumePresetsGroupedByCategory = async () => {
 		if (!groups[preset.category]) {
 			groups[preset.category] = []
 		}
-		groups[preset.category].push(preset)
+		groups[preset.category]!.push(preset)
 		return groups
 	}, {})
 }

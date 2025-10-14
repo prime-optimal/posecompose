@@ -179,7 +179,10 @@ async function handler(request: Request): Promise<Response> {
 		? `https://${process.env.VERCEL_URL}`
 		: 'http://localhost:3000'
 	)  
-	const requestOrigin = (request as any).headers.get('origin')
+	const requestOrigin =
+		typeof (request as any).headers?.get === 'function'
+			? (request as any).headers.get('origin')
+			: (request as any).headers?.origin ?? (request as any).headers?.Origin ?? null
   const allowedOrigin = resolveAllowedOrigin(requestOrigin)
 
   // CORS preflight
@@ -211,7 +214,7 @@ async function handler(request: Request): Promise<Response> {
 if (typeof (globalThis as any).Bun !== 'undefined' && !process.env.VERCEL) {
   console.log(`🌀  Running local Bun server on http://localhost:${API_PORT}`)
   const server = (globalThis as any).Bun.serve({ port: API_PORT, fetch: handler })
-  console.log(`Neon costume API listening on ${server.url.origin}`)
+  console.log(`Neon costume API is listening on ${server.url.origin}`)
 }
 
 // ----- Vercel / Node expects the function export -----

@@ -3,13 +3,23 @@
  * Simple API for managing costume data and interactions
  */
 
-import type { CostumePreset } from '@/types/costume'
-import { HALLOWEEN_COSTUMES } from '@/data/costumes'
+import type { CostumePreset } from '@/types/costume.js'
 import {
 	fetchCostume,
 	fetchCostumes,
 	fetchFeaturedCostumes,
-} from '@/services/costume-service'
+} from '@/services/costume-service.js'
+
+/**
+ * Lazy load fallback costumes only when needed
+ */
+const loadFallbackCostumes = async (): Promise<CostumePreset[]> => {
+	if (import.meta.env.DEV) {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+		return HALLOWEEN_COSTUMES
+	}
+	return []
+}
 
 /**
  * Get all costumes
@@ -19,7 +29,7 @@ export const getAllCostumes = async (): Promise<CostumePreset[]> => {
 		return await fetchCostumes()
 	} catch (error) {
 		console.error('Failed to load costumes via service, returning fallback set.', error)
-		return HALLOWEEN_COSTUMES
+		return await loadFallbackCostumes()
 	}
 }
 
@@ -38,7 +48,8 @@ export const getCostumeById = async (
 		console.error(`Failed to load costume ${id} via service.`, error)
 	}
 
-	return HALLOWEEN_COSTUMES.find(costume => costume.id === id)
+	const fallbackCostumes = await loadFallbackCostumes()
+	return fallbackCostumes.find(costume => costume.id === id)
 }
 
 /**
@@ -59,7 +70,8 @@ export const getFeaturedCostumes = async (): Promise<CostumePreset[]> => {
 		return await fetchFeaturedCostumes()
 	} catch (error) {
 		console.error('Failed to load featured costumes via service, using fallback set.', error)
-		return HALLOWEEN_COSTUMES.filter(costume => costume.isFeatured)
+		const fallbackCostumes = await loadFallbackCostumes()
+		return fallbackCostumes.filter(costume => costume.isFeatured)
 	}
 }
 

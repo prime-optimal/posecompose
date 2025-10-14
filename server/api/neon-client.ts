@@ -1,6 +1,6 @@
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
-import type { CostumeAsset, CostumePreset } from '../../src/types/costume.js'
-import { loadCostumePresets } from '../../scripts/utils/costume-loader.js'
+import type { CostumeAsset, CostumePreset } from '../types/costume.ts'
+import { loadCostumePresets } from '../utils/costume-loader.js'
 
 const connectionString =
 	process.env.NEON_DATABASE_URL_READONLY ?? process.env.NEON_DATABASE_URL ?? ''
@@ -172,7 +172,7 @@ export const getCostumeById = async (id: string): Promise<CostumePreset | null> 
 	}
 
 	const localCostumes = await loadCostumePresets()
-	return localCostumes.find(costume => costume.id === id) ?? null
+	return localCostumes.find((costume: CostumePreset) => costume.id === id) ?? null
 }
 
 export const getFeaturedCostumes = async (): Promise<CostumePreset[]> => {

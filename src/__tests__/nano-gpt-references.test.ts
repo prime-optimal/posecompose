@@ -1,14 +1,10 @@
 import { describe, expect, it } from 'bun:test'
-import { HALLOWEEN_COSTUMES } from '@/data/costumes'
-import {
-	buildNanoGptReferences,
-	MODEL_REFERENCE_LIMITS,
-	SAMPLE_COSTUME_REFERENCE_URL,
-	SAMPLE_SELFIE_REFERENCE_URL,
-} from '@/lib/ai'
+import { buildNanoGptReferences, SAMPLE_COSTUME_REFERENCE_URL, SAMPLE_SELFIE_REFERENCE_URL } from '@/lib/ai/references'
+import { MODEL_REFERENCE_LIMITS } from '@/lib/ai/nano-gpt'
 
 describe('buildNanoGptReferences', () => {
-	it('prioritizes the user selfie and respects model limits', () => {
+	it('prioritizes the user selfie and respects model limits', async () => {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
 		const costume = HALLOWEEN_COSTUMES[0]
 	const selfie = 'dGVzdC1zZWxmaWU='
 		const references = buildNanoGptReferences({
@@ -24,7 +20,8 @@ describe('buildNanoGptReferences', () => {
 		)
 	})
 
-	it('falls back to sample assets when costume references are unavailable', () => {
+	it('falls back to sample assets when costume references are unavailable', async () => {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
 		const baseCostume = HALLOWEEN_COSTUMES[0]
 		const costume = {
 			...baseCostume,
@@ -42,7 +39,8 @@ describe('buildNanoGptReferences', () => {
 		expect(userReference?.value).toBe(SAMPLE_SELFIE_REFERENCE_URL)
 	})
 
-	it('includes costume URLs alongside base64 selfie data when provided', () => {
+	it('includes costume URLs alongside base64 selfie data when provided', async () => {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
 		const baseCostume = HALLOWEEN_COSTUMES[0]
 		const costume = {
 			...baseCostume,
@@ -77,7 +75,8 @@ describe('buildNanoGptReferences', () => {
 		expect(references.length).toBeLessThanOrEqual(limit)
 	})
 
-	it('only returns user references for the background-remover model', () => {
+	it('only returns user references for the background-remover model', async () => {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
 		const costume = HALLOWEEN_COSTUMES[0]
 		const references = buildNanoGptReferences({
 			costume,

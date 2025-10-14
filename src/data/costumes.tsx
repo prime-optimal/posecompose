@@ -15,6 +15,34 @@ const createAffiliateLink = (
   ...options
 });
 
+
+
+export const fallbackCostumes = [
+  {
+    id: 'placeholder',
+    name: 'Placeholder Costume',
+    description: 'Used only when API data is unavailable',
+    assets: [
+      {
+        type: 'profile',
+        url: 'https://f004.backblazeb2.com/file/waifu-test/costumes/placeholder.svg',
+      },
+    ],
+    affiliateLinks: [
+      createAffiliateLink(
+        'example',
+        'Buy on Example',
+        'https://example.com/item',
+        'Amazon'
+      ),
+    ],
+  },
+];
+
+export const costumes =
+  import.meta.env.MODE === 'development' ? fallbackCostumes : [];
+
+
 // Halloween Launch Collection
 export const HALLOWEEN_COSTUMES: CostumePreset[] = [
   {
@@ -714,6 +742,8 @@ export const HALLOWEEN_COSTUMES: CostumePreset[] = [
     inspiration: 'Modern witchcraft, crystal healing, dark fantasy manga'
   }
 ];
+
+
 
 // Costume Categories
 export const COSTUME_CATEGORIES: CostumeCategory[] = [

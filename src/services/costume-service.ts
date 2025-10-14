@@ -1,5 +1,4 @@
 import type { CostumePreset } from '@/types/costume'
-import { HALLOWEEN_COSTUMES } from '@/data/costumes'
 
 const getApiBaseUrl = () => {
 	const rawBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
@@ -48,7 +47,11 @@ export const fetchCostumes = async (): Promise<CostumePreset[]> => {
 		console.error('Failed to fetch costumes from API, using fallback data.', error)
 	}
 
-	return HALLOWEEN_COSTUMES
+	if (import.meta.env.DEV) {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+		return HALLOWEEN_COSTUMES
+	}
+	return []
 }
 
 export const fetchCostume = async (id: string): Promise<CostumePreset | undefined> => {
@@ -61,7 +64,11 @@ export const fetchCostume = async (id: string): Promise<CostumePreset | undefine
 		console.warn(`Costume ${id} not available via API, falling back to local data.`, error)
 	}
 
-	return HALLOWEEN_COSTUMES.find(costume => costume.id === id)
+	if (import.meta.env.DEV) {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+		return HALLOWEEN_COSTUMES.find(costume => costume.id === id)
+	}
+	return undefined
 }
 
 export const fetchFeaturedCostumes = async (): Promise<CostumePreset[]> => {
@@ -75,5 +82,9 @@ export const fetchFeaturedCostumes = async (): Promise<CostumePreset[]> => {
 		console.warn('Failed to load featured costumes from API, falling back to local data.', error)
 	}
 
-	return HALLOWEEN_COSTUMES.filter(costume => costume.isFeatured)
+	if (import.meta.env.DEV) {
+		const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+		return HALLOWEEN_COSTUMES.filter(costume => costume.isFeatured)
+	}
+	return []
 }

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { HALLOWEEN_COSTUMES } from '@/data/costumes';
 import { fetchCostumes } from '@/services/costume-service';
 import { CostumePreset } from '@/types/costume';
 import { logEvent } from '@/lib/logger';
@@ -15,8 +14,8 @@ interface CostumeSelectionProps {
 }
 
 export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: CostumeSelectionProps) => {
-  const [costumes, setCostumes] = useState<CostumePreset[]>(HALLOWEEN_COSTUMES);
-  const [loadingCostumes, setLoadingCostumes] = useState(false);
+  const [costumes, setCostumes] = useState<CostumePreset[]>([]);
+  const [loadingCostumes, setLoadingCostumes] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activeCostume, setActiveCostume] = useState<string | null>(
     selectedCostume?.id || null
@@ -35,7 +34,12 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
       } catch (error) {
         console.error('Failed to fetch costumes from Neon API:', error);
         if (!isMounted) return;
-        setCostumes(HALLOWEEN_COSTUMES);
+        if (import.meta.env.DEV) {
+          const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+          setCostumes(HALLOWEEN_COSTUMES);
+        } else {
+          setCostumes([]);
+        }
         setLoadError('Unable to reach Neon catalog. Showing fallback costumes.');
         toast.error('Unable to reach Neon catalog. Showing fallback costumes.');
       } finally {
@@ -70,12 +74,15 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
     });
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (activeCostume) {
-      const costume =
-        costumes.find(item => item.id === activeCostume) ??
-        HALLOWEEN_COSTUMES.find(item => item.id === activeCostume) ??
-        null;
+      let costume = costumes.find(item => item.id === activeCostume) ?? null;
+
+      if (!costume && import.meta.env.DEV) {
+        const { HALLOWEEN_COSTUMES } = await import('@/data/costumes.js')
+        costume = HALLOWEEN_COSTUMES.find(item => item.id === activeCostume) ?? null;
+      }
+
       if (costume) {
         onCostumeSelect(costume);
         toast.success(`${costume.name} costume ready! Now upload your selfie.`);
