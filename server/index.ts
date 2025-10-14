@@ -12,39 +12,93 @@ const ASSET_ROOT = path.join(PROJECT_ROOT, 'assets')
 
 const API_PORT = Number.parseInt(process.env.API_PORT ?? '4000', 10)
 const ALLOW_ORIGIN = process.env.API_ALLOW_ORIGIN ?? '*'
+const LOG_SINK = process.env.LOG_SINK ?? 'stdout'
 
-const jsonResponse = (body: unknown, status = 200) =>
-	new Response(JSON.stringify(body, null, 2), {
-		status,
-		headers: {
-			'Content-Type': 'application/json',
-			'Access-Control-Allow-Origin': ALLOW_ORIGIN,
-			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-			'Access-Control-Allow-Methods': 'GET, OPTIONS',
-		},
+type LogLevel = 'info' | 'error'
+
+interface IngestedLogEntry {
+	event: string
+	level: LogLevel
+	timestamp: string
+	[key: string]: unknown
+}
+
+const parseAllowedOrigins = () =>
+	ALLOW_ORIGIN.split(',')
+		.map(origin => origin.trim())
+		.filter(Boolean)
+
+const ALLOWED_ORIGINS = parseAllowedOrigins()
+const ALLOW_WILDCARD = ALLOWED_ORIGINS.includes('*')
+
+const resolveAllowedOrigin = (requestOrigin: string | null) => {
+	if (ALLOW_WILDCARD) {
+		if (requestOrigin) {
+			return requestOrigin
+		}
+		return '*'
+	}
+
+	if (!requestOrigin) {
+		return ALLOWED_ORIGINS[0] ?? '*'
+	}
+
+	const normalizedOrigin = requestOrigin.toLowerCase()
+	const match = ALLOWED_ORIGINS.find(origin => origin.toLowerCase() === normalizedOrigin)
+	return match ?? 'null'
+}
+
+const buildCorsHeaders = (origin: string) => {
+	const headers: Record<string, string> = {
+		'Access-Control-Allow-Origin': origin,
+		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+		'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+		Vary: 'Origin',
+	}
+
+	if (origin !== '*' && origin !== 'null') {
+		headers['Access-Control-Allow-Credentials'] = 'true'
+	}
+
+	return headers
+}
+
+const withCors = (response: Response, origin: string) => {
+	const headers = buildCorsHeaders(origin)
+	Object.entries(headers).forEach(([key, value]) => {
+		response.headers.set(key, value)
 	})
-
-const withCors = (response: Response) => {
-	response.headers.set('Access-Control-Allow-Origin', ALLOW_ORIGIN)
-	response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-	response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS')
 	return response
 }
 
-const notFound = () => jsonResponse({ error: 'Not found' }, 404)
+const jsonResponse = (body: unknown, status: number, origin: string) =>
+	withCors(
+		new Response(JSON.stringify(body, null, 2), {
+			status,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}),
+		origin,
+	)
 
-const serveStaticAsset = async (pathname: string) => {
+const emptyResponse = (status: number, origin: string) =>
+	withCors(new Response(null, { status }), origin)
+
+const notFound = (origin: string) => jsonResponse({ error: 'Not found' }, 404, origin)
+
+const serveStaticAsset = async (pathname: string, origin: string) => {
 	const relativePath = pathname.replace(/^\/assets\//, '')
 	const normalized = path.normalize(relativePath)
 	const absolutePath = path.join(ASSET_ROOT, normalized)
 
 	if (!absolutePath.startsWith(ASSET_ROOT)) {
-		return notFound()
+		return notFound(origin)
 	}
 
 	const file = Bun.file(absolutePath)
 	if (!(await file.exists())) {
-		return notFound()
+		return notFound(origin)
 	}
 
 	const response = new Response(file, {
@@ -53,22 +107,22 @@ const serveStaticAsset = async (pathname: string) => {
 		},
 	})
 
-	return withCors(response)
+	return withCors(response, origin)
 }
 
-const handleApiRequest = async (url: URL) => {
+const handleApiRequest = async (url: URL, origin: string) => {
 	if (url.pathname === '/api/health') {
-		return jsonResponse({ status: 'ok', timestamp: new Date().toISOString() })
+		return jsonResponse({ status: 'ok', timestamp: new Date().toISOString() }, 200, origin)
 	}
 
 	if (url.pathname === '/api/costumes') {
 		const costumes = await getAllCostumes()
-		return jsonResponse({ count: costumes.length, items: costumes })
+		return jsonResponse({ count: costumes.length, items: costumes }, 200, origin)
 	}
 
 	if (url.pathname === '/api/costumes/featured') {
 		const costumes = await getFeaturedCostumes()
-		return jsonResponse({ count: costumes.length, items: costumes })
+		return jsonResponse({ count: costumes.length, items: costumes }, 200, origin)
 	}
 
 	const costumeByIdMatch = url.pathname.match(/^\/api\/costumes\/([a-z0-9-_%@.]+)/i)
@@ -76,12 +130,67 @@ const handleApiRequest = async (url: URL) => {
 		const costumeId = decodeURIComponent(costumeByIdMatch[1])
 		const costume = await getCostumeById(costumeId)
 		if (!costume) {
-			return notFound()
+			return notFound(origin)
 		}
-		return jsonResponse(costume)
+		return jsonResponse(costume, 200, origin)
 	}
 
-	return notFound()
+	return notFound(origin)
+}
+
+const isLogLevel = (level: unknown): level is LogLevel =>
+	level === 'info' || level === 'error'
+
+const emitLog = (entry: IngestedLogEntry) => {
+	const payload = {
+		...entry,
+		receivedAt: new Date().toISOString(),
+	}
+
+	if (LOG_SINK === 'stdout' || LOG_SINK === 'console') {
+		if (entry.level === 'error') {
+			console.error('[PoseCompose]', payload)
+			return
+		}
+		console.info('[PoseCompose]', payload)
+		return
+	}
+
+	console.warn('[PoseCompose] Unsupported LOG_SINK, defaulting to console', {
+		sink: LOG_SINK,
+	})
+	console.info('[PoseCompose]', payload)
+}
+
+const handleLogIngest = async (request: Request, origin: string) => {
+	let payload: unknown
+	try {
+		payload = await request.json()
+	} catch (error) {
+		return jsonResponse({ error: 'Invalid JSON payload' }, 400, origin)
+	}
+
+	if (!payload || typeof payload !== 'object') {
+		return jsonResponse({ error: 'Log payload must be an object' }, 400, origin)
+	}
+
+	const record = payload as Record<string, unknown>
+	const { event, level, timestamp } = record
+
+	if (typeof event !== 'string' || !event.trim()) {
+		return jsonResponse({ error: 'Log payload requires a non-empty "event"' }, 400, origin)
+	}
+
+	if (!isLogLevel(level)) {
+		return jsonResponse({ error: 'Log payload must include a valid "level"' }, 400, origin)
+	}
+
+	if (typeof timestamp !== 'string' || !timestamp.trim()) {
+		return jsonResponse({ error: 'Log payload must include a timestamp' }, 400, origin)
+	}
+
+	emitLog(record as IngestedLogEntry)
+	return emptyResponse(204, origin)
 }
 
 const server = Bun.serve({
@@ -89,21 +198,36 @@ const server = Bun.serve({
 	fetch: async request => {
 		const { method } = request
 		const url = new URL(request.url)
+		const requestOrigin = request.headers.get('origin')
+		const allowedOrigin = resolveAllowedOrigin(requestOrigin)
 
 		if (method === 'OPTIONS') {
-			return withCors(new Response(null, { status: 204 }))
+			const preflight = new Response(null, {
+				status: 204,
+				headers: {
+					'Access-Control-Max-Age': '600',
+				},
+			})
+			return withCors(preflight, allowedOrigin)
 		}
 
 		if (url.pathname.startsWith('/assets/')) {
-			return serveStaticAsset(url.pathname)
+			return serveStaticAsset(url.pathname, allowedOrigin)
 		}
 
 		if (url.pathname.startsWith('/api/')) {
-			const response = await handleApiRequest(url)
-			return withCors(response)
+			if (url.pathname === '/api/logs') {
+				if (method !== 'POST') {
+					return jsonResponse({ error: 'Method not allowed' }, 405, allowedOrigin)
+				}
+				return handleLogIngest(request, allowedOrigin)
+			}
+
+			const response = await handleApiRequest(url, allowedOrigin)
+			return withCors(response, allowedOrigin)
 		}
 
-		return notFound()
+		return notFound(allowedOrigin)
 	},
 })
 
