@@ -28,5 +28,5 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["api", "netlify"]
+  "include": ["api", "netlify", "types"]
 }

@@ -13,7 +13,7 @@ const resolveHandler = async (): Promise<ApiHandler> => {
 	}
 
 	if (!cachedHandler) {
-		const module = await import('../../../api/index.js')
+		const module = await import('../../../server/api/index.js')
 		cachedHandler = module.default as ApiHandler
 	}
 
