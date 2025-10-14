@@ -26,7 +26,7 @@ dist-ssr
 # Internal project files
 .factory/
 AGENTS.md
-docs/*.md
+# docs/*.md - Commented out to allow important documentation
 
 # Phase management and internal tracking
 SUBPHASE_*/
@@ -63,3 +63,9 @@ temp/
 
 # Costume images
 assets/costumes/
+
+# Local Netlify folder
+.netlify
+
+# Netlify functions
+# netlify/
