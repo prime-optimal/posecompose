@@ -1,16 +1,9 @@
-import * as path from 'path'
-import { fileURLToPath } from 'url'
 import {
 	getAllCostumes,
 	getCostumeById,
 	getFeaturedCostumes,
 } from './neon-client.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url!))
-const PROJECT_ROOT = path.resolve(__dirname, '..')
-const ASSET_ROOT = path.join(PROJECT_ROOT, 'assets')
-
-const API_PORT = Number.parseInt(process.env.API_PORT ?? '4000', 10)
 const ALLOW_ORIGIN = process.env.API_ALLOW_ORIGIN ?? '*'
 const LOG_SINK = process.env.LOG_SINK ?? 'stdout'
 
@@ -65,10 +58,12 @@ const buildCorsHeaders = (origin: string) => {
 
 const withCors = (response: Response, origin: string) => {
 	const headers = buildCorsHeaders(origin)
-	Object.entries(headers).forEach(([key, value]) => {
-		response.headers.set(key, value)
+	const newResponse = new Response((response as any).body, {
+		status: (response as any).status,
+		statusText: (response as any).statusText,
+		headers: { ...(response as any).headers, ...headers }
 	})
-	return response
+	return newResponse
 }
 
 const jsonResponse = (body: unknown, status: number, origin: string) =>
@@ -87,31 +82,6 @@ const emptyResponse = (status: number, origin: string) =>
 
 const notFound = (origin: string) => jsonResponse({ error: 'Not found' }, 404, origin)
 
-const serveStaticAsset = async (pathname: string, origin: string) => {
-	const relativePath = pathname.replace(/^\/assets\//, '')
-	const normalized = path.normalize(relativePath)
-	const absolutePath = path.join(ASSET_ROOT, normalized)
-
-	if (!absolutePath.startsWith(ASSET_ROOT)) {
-		return notFound(origin)
-	}
-
-	const fs = await import('fs/promises')
-	try {
-		await fs.access(absolutePath)
-	} catch {
-		return notFound(origin)
-	}
-
-	const file = await fs.readFile(absolutePath)
-	const response = new Response(file as any, {
-		headers: {
-			'Cache-Control': 'public, max-age=604800, immutable',
-		},
-	})
-
-	return withCors(response, origin)
-}
 
 const handleApiRequest = async (url: URL, origin: string) => {
 	if (url.pathname === '/api/health') {
@@ -129,7 +99,7 @@ const handleApiRequest = async (url: URL, origin: string) => {
 	}
 
 	const costumeByIdMatch = url.pathname.match(/^\/api\/costumes\/([a-z0-9-_%@.]+)/i)
-	if (costumeByIdMatch) {
+	if (costumeByIdMatch && costumeByIdMatch[1]) {
 		const costumeId = decodeURIComponent(costumeByIdMatch[1])
 		const costume = await getCostumeById(costumeId)
 		if (!costume) {
@@ -168,7 +138,7 @@ const emitLog = (entry: IngestedLogEntry) => {
 const handleLogIngest = async (request: Request, origin: string) => {
 	let payload: unknown
 	try {
-		payload = await request.json()
+		payload = await (request as any).json()
 	} catch (error) {
 		return jsonResponse({ error: 'Invalid JSON payload' }, 400, origin)
 	}
@@ -196,42 +166,53 @@ const handleLogIngest = async (request: Request, origin: string) => {
 	return emptyResponse(204, origin)
 }
 
-const server = Bun.serve({
-	port: API_PORT,
-	fetch: async (request: Request) => {
-		const { method } = request
-		const url = new URL(request.url)
-		const requestOrigin = request.headers.get('origin')
-		const allowedOrigin = resolveAllowedOrigin(requestOrigin)
+const API_PORT = process.env.PORT ? Number(process.env.PORT) : 3000
 
-		if (method === 'OPTIONS') {
-			const preflight = new Response(null, {
-				status: 204,
-				headers: {
-					'Access-Control-Max-Age': '600',
-				},
-			})
-			return withCors(preflight, allowedOrigin)
-		}
+// Shared request handler that works in both Node (Vercel) and Bun
+async function handler(request: Request): Promise<Response> {
+	const { method } = request as any
+	
+	// use absolute URL when running locally; use resolved base otherwise
+	const url = new URL(
+	request.url,
+	process.env.VERCEL_URL
+		? `https://${process.env.VERCEL_URL}`
+		: 'http://localhost:3000'
+	)  
+	const requestOrigin = (request as any).headers.get('origin')
+  const allowedOrigin = resolveAllowedOrigin(requestOrigin)
 
-		if (url.pathname.startsWith('/assets/')) {
-			return serveStaticAsset(url.pathname, allowedOrigin)
-		}
+  // CORS preflight
+  if (method === 'OPTIONS') {
+    const preflight = new Response(null, {
+      status: 204,
+      headers: { 'Access-Control-Max-Age': '600' },
+    })
+    return withCors(preflight, allowedOrigin)
+  }
 
-		if (url.pathname.startsWith('/api/')) {
-			if (url.pathname === '/api/logs') {
-				if (method !== 'POST') {
-					return jsonResponse({ error: 'Method not allowed' }, 405, allowedOrigin)
-				}
-				return handleLogIngest(request, allowedOrigin)
-			}
+  // API routes
+  if (url.pathname.startsWith('/api/')) {
+    if (url.pathname === '/api/logs') {
+      if (method !== 'POST') {
+        return jsonResponse({ error: 'Method not allowed' }, 405, allowedOrigin)
+      }
+      return handleLogIngest(request, allowedOrigin)
+    }
 
-			const response = await handleApiRequest(url, allowedOrigin)
-			return withCors(response, allowedOrigin)
-		}
+    const response = await handleApiRequest(url, allowedOrigin)
+    return withCors(response, allowedOrigin)
+  }
 
-		return notFound(allowedOrigin)
-	},
-})
+  return notFound(allowedOrigin)
+}
 
-console.log(`Neon costume API listening on ${server.url.origin}`)
+// ----- Conditional local server using Bun -----
+if (typeof (globalThis as any).Bun !== 'undefined' && !process.env.VERCEL) {
+  console.log(`🌀  Running local Bun server on http://localhost:${API_PORT}`)
+  const server = (globalThis as any).Bun.serve({ port: API_PORT, fetch: handler })
+  console.log(`Neon costume API listening on ${server.url.origin}`)
+}
+
+// ----- Vercel / Node expects the function export -----
+export default handler
