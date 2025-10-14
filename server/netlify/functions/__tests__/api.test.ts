@@ -37,11 +37,7 @@ process.env.VERCEL = process.env.VERCEL ?? '1'
 const moduleLoaders: Array<{ label: string; loader: () => Promise<ApiModule> }> = [
 	{
 		label: 'server/netlify/functions/api',
-		loader: () => import('../api/index.mts'),
-	},
-	{
-		label: 'netlify/functions/api',
-		loader: () => import('../../../../netlify/functions/api/index.mts'),
+		loader: () => import('../api/index.mjs'),
 	},
 ]
 

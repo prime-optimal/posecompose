@@ -20,5 +20,5 @@
     "noUnusedLocals": false,
     "strictNullChecks": false
   },
-  "include": ["src", "server", "scripts"]
-  }
+  "include": []
+}

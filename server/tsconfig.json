@@ -11,9 +11,9 @@
     // Bundler mode
     "moduleResolution": "NodeNext",
     "types": ["node"],
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist",
 
     // Best practices
     "strict": true,
@@ -28,5 +28,5 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["api", "netlify", "types"]
+  "include": ["api", "netlify", "types", "utils"]
 }

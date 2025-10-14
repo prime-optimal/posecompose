@@ -1,0 +1,401 @@
+Title: Image Generation (OpenAI-Compatible) - NanoGPT API Documentation
+URL: https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai
+
+[Skip to main content](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#content-area)
+
+[NanoGPT API Documentation home page![light logo](https://mintcdn.com/nano-gpt/1yMRHEfiogPQFOKv/logo/light.svg?fit=max&auto=format&n=1yMRHEfiogPQFOKv&q=85&s=bfe91d882f75252f47e89eab1b91f39c)![dark logo](https://mintcdn.com/nano-gpt/1yMRHEfiogPQFOKv/logo/dark.svg?fit=max&auto=format&n=1yMRHEfiogPQFOKv&q=85&s=8ee57975e594b16bd870f211ba556ebd)](https://docs.nano-gpt.com/)
+
+Search...
+
+Ctrl K
+
+Search...
+
+Navigation
+
+Endpoint Examples
+
+Image Generation (OpenAI-Compatible)
+
+cURL
+
+cURL
+
+Copy
+
+```
+curl --request POST \
+  --url https://nano-gpt.com/v1/images/generations \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "model": "hidream",
+  "prompt": "<string>",
+  "n": 1,
+  "size": "256x256",
+  "response_format": "url",
+  "user": "<string>",
+  "imageDataUrl": "data:image/jpeg;base64,/9j/4AAQ...",
+  "imageDataUrls": [\
+    "data:image/jpeg;base64,/9j/4AAQ...",\
+    "data:image/png;base64,iVBORw0KGgo..."\
+  ],
+  "maskDataUrl": "data:image/png;base64,iVBORw0KGgo...",
+  "strength": 0.8,
+  "guidance_scale": 7.5,
+  "num_inference_steps": 30,
+  "seed": 42,
+  "kontext_max_mode": false
+}'
+```
+
+200
+
+400
+
+Copy
+
+```
+{
+  "created": 123,
+  "data": [\
+    {\
+      "url": "<string>",\
+      "b64_json": "<string>"\
+    }\
+  ],
+  "cost": 123,
+  "paymentSource": "<string>",
+  "remainingBalance": 123
+}
+```
+
+POST
+
+/
+
+v1
+
+/
+
+images
+
+/
+
+generations
+
+Try it
+
+cURL
+
+cURL
+
+Copy
+
+```
+curl --request POST \
+  --url https://nano-gpt.com/v1/images/generations \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "model": "hidream",
+  "prompt": "<string>",
+  "n": 1,
+  "size": "256x256",
+  "response_format": "url",
+  "user": "<string>",
+  "imageDataUrl": "data:image/jpeg;base64,/9j/4AAQ...",
+  "imageDataUrls": [\
+    "data:image/jpeg;base64,/9j/4AAQ...",\
+    "data:image/png;base64,iVBORw0KGgo..."\
+  ],
+  "maskDataUrl": "data:image/png;base64,iVBORw0KGgo...",
+  "strength": 0.8,
+  "guidance_scale": 7.5,
+  "num_inference_steps": 30,
+  "seed": 42,
+  "kontext_max_mode": false
+}'
+```
+
+200
+
+400
+
+Copy
+
+```
+{
+  "created": 123,
+  "data": [\
+    {\
+      "url": "<string>",\
+      "b64_json": "<string>"\
+    }\
+  ],
+  "cost": 123,
+  "paymentSource": "<string>",
+  "remainingBalance": 123
+}
+```
+
+#### Authorizations
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#authorization-authorization)
+
+Authorization
+
+string
+
+header
+
+required
+
+Bearer authentication header of the form `Bearer <token>`, where `<token>` is your auth token.
+
+#### Body
+
+application/json
+
+Parameters for image generation
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-prompt)
+
+prompt
+
+string
+
+required
+
+The text prompt to generate an image from
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-model)
+
+model
+
+string
+
+default:hidream
+
+The model to use for generation
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-n)
+
+n
+
+integer
+
+default:1
+
+Number of images to generate
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-size)
+
+size
+
+enum<string>
+
+The size of the generated images
+
+Available options:
+
+`256x256`,
+
+`512x512`,
+
+`1024x1024`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-response-format)
+
+response\_format
+
+enum<string>
+
+The format in which the generated images are returned
+
+Available options:
+
+`url`,
+
+`b64_json`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-user)
+
+user
+
+string
+
+A unique identifier representing your end-user
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-image-data-url)
+
+imageDataUrl
+
+string
+
+Base64-encoded image data URL for img2img generation. Single image input for models that support image-to-image transformation. Format: data:image/\[type\];base64,\[data\]. Note: Direct URL input is not supported - images must be converted to base64 data URLs before submission.
+
+Example:
+
+`"data:image/jpeg;base64,/9j/4AAQ..."`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-image-data-urls)
+
+imageDataUrls
+
+string<data-url>\[\]
+
+Array of base64-encoded image data URLs for models supporting multiple image inputs (e.g., flux-kontext, gpt-4o-image, gpt-image-1). Each URL must follow the format: data:image/\[type\];base64,\[data\]
+
+Example:
+
+```
+[\
+  "data:image/jpeg;base64,/9j/4AAQ...",\
+  "data:image/png;base64,iVBORw0KGgo..."\
+]
+```
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-mask-data-url)
+
+maskDataUrl
+
+string
+
+Base64-encoded mask image data URL for inpainting models (e.g., flux-lora/inpainting). White areas indicate regions to edit. Format: data:image/\[type\];base64,\[data\]
+
+Example:
+
+`"data:image/png;base64,iVBORw0KGgo..."`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-strength)
+
+strength
+
+number
+
+default:0.8
+
+Controls how much the output differs from the input image in img2img mode. Lower values produce outputs closer to the input.
+
+Required range: `0 <= x <= 1`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-guidance-scale)
+
+guidance\_scale
+
+number
+
+default:7.5
+
+How closely the model follows the text prompt. Higher values result in images more closely aligned with the prompt.
+
+Required range: `0 <= x <= 20`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-num-inference-steps)
+
+num\_inference\_steps
+
+integer
+
+default:30
+
+Number of denoising steps. More steps generally produce higher quality but take longer.
+
+Required range: `1 <= x <= 100`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-seed)
+
+seed
+
+integer
+
+Random seed for reproducible generation. Use the same seed with the same parameters to get identical results.
+
+Example:
+
+`42`
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#body-kontext-max-mode)
+
+kontext\_max\_mode
+
+boolean
+
+default:false
+
+Enable enhanced context mode for flux-kontext model. Provides better understanding of input images.
+
+#### Response
+
+200
+
+application/json
+
+Image generation response
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-created)
+
+created
+
+integer
+
+Unix timestamp of when the image was created
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-data)
+
+data
+
+object\[\]
+
+List of generated images
+
+Show child attributes
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-data-url)
+
+url
+
+string
+
+URL to the generated image
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-data-b64-json)
+
+b64\_json
+
+string
+
+Base64 encoded image data
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-cost)
+
+cost
+
+number
+
+Cost of the generation
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-payment-source)
+
+paymentSource
+
+string
+
+Payment source used
+
+[​](https://docs.nano-gpt.com/api-reference/endpoint/image-generation-openai#response-remaining-balance)
+
+remainingBalance
+
+number
+
+Remaining balance after the generation
+
+[Image Generation](https://docs.nano-gpt.com/api-reference/endpoint/image-generation) [Speech-to-Text Transcription](https://docs.nano-gpt.com/api-reference/endpoint/transcribe)
+
+CtrlI
+
+Assistant
+
+Responses are generated using AI and may contain mistakes.

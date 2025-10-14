@@ -4,6 +4,10 @@ import {
 	getFeaturedCostumes,
 } from './neon-client.js'
 
+// Load environment variables from root directory
+import { config } from 'dotenv'
+config({ path: '../.env' })
+
 const ALLOW_ORIGIN = process.env.API_ALLOW_ORIGIN ?? '*'
 const LOG_SINK = process.env.LOG_SINK ?? 'stdout'
 
@@ -44,7 +48,7 @@ const resolveAllowedOrigin = (requestOrigin: string | null) => {
 const buildCorsHeaders = (origin: string) => {
 	const headers: Record<string, string> = {
 		'Access-Control-Allow-Origin': origin,
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+		'Access-Control-Allow-Headers': 'Content-Type, Authorization, content-type',
 		'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 		Vary: 'Origin',
 	}
@@ -166,7 +170,7 @@ const handleLogIngest = async (request: Request, origin: string) => {
 	return emptyResponse(204, origin)
 }
 
-const API_PORT = process.env.PORT ? Number(process.env.PORT) : 3000
+const API_PORT = process.env.PORT ? Number(process.env.PORT) : 4000
 
 // Shared request handler that works in both Node (Vercel) and Bun
 async function handler(request: Request): Promise<Response> {
@@ -174,11 +178,12 @@ async function handler(request: Request): Promise<Response> {
 	
 	// use absolute URL when running locally; use resolved base otherwise
 	const url = new URL(
-	request.url,
-	process.env.VERCEL_URL
-		? `https://${process.env.VERCEL_URL}`
-		: 'http://localhost:3000'
-	)  
+		request.url,
+		process.env.VERCEL_URL
+			? `https://${process.env.VERCEL_URL}`
+			: 'http://localhost:4000'
+	)
+	
 	const requestOrigin =
 		typeof (request as any).headers?.get === 'function'
 			? (request as any).headers.get('origin')

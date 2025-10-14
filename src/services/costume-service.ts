@@ -2,19 +2,24 @@ import type { CostumePreset } from '@/types/costume'
 
 const getApiBaseUrl = () => {
 	const rawBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
+	
 	if (!rawBaseUrl) {
 		return ''
 	}
+	
 	return rawBaseUrl.replace(/\/$/, '')
 }
 
 const request = async <T>(endpoint: string): Promise<T> => {
 	const baseUrl = getApiBaseUrl()
 	const url = `${baseUrl}${endpoint}`
-	const response = await fetch(url)
+	
+	const response = await fetch(url, {
+		signal: AbortSignal.timeout(10000) // 10 second timeout
+	})
 
 	if (!response.ok) {
-		throw new Error(`Request failed: ${response.status}`)
+		throw new Error(`Request failed: ${response.status} ${response.statusText}`)
 	}
 
 	return response.json() as Promise<T>

@@ -1,32 +1,24 @@
-import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
-import { loadCostumePresets } from './utils/costume-loader.js'
-import type { CostumeAsset } from '../src/types/costume.js'
-
-const slugify = (value: string) =>
-	value
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+/, '')
-		.replace(/-+$/, '')
-
-const sentenceCase = (value: string) =>
-	value
-		.replace(/[-_]/g, ' ')
-		.replace(/\s+/g, ' ')
-		.trim()
-		.replace(/\b\w/g, char => char.toUpperCase())
-
+import { neon } from '@neondatabase/serverless';
+import { loadCostumePresets } from './utils/costume-loader.js';
+const slugify = (value) => value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+const sentenceCase = (value) => value
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, char => char.toUpperCase());
 const createSqlClient = () => {
-	const url = process.env.NEON_DATABASE_URL
-	if (!url) {
-		throw new Error('NEON_DATABASE_URL is not set. Please add it to your environment before running the seed script.')
-	}
-
-	return neon(url)
-}
-
-const ensureTables = async (sql: NeonQueryFunction<false, false>) => {
-	await sql`
+    const url = process.env.NEON_DATABASE_URL;
+    if (!url) {
+        throw new Error('NEON_DATABASE_URL is not set. Please add it to your environment before running the seed script.');
+    }
+    return neon(url);
+};
+const ensureTables = async (sql) => {
+    await sql `
 		CREATE TABLE IF NOT EXISTS costume_categories (
 			id TEXT PRIMARY KEY,
 			slug TEXT UNIQUE NOT NULL,
@@ -37,9 +29,8 @@ const ensureTables = async (sql: NeonQueryFunction<false, false>) => {
 			created_at TIMESTAMPTZ DEFAULT NOW(),
 			updated_at TIMESTAMPTZ DEFAULT NOW()
 		)
-	`
-
-	await sql`
+	`;
+    await sql `
 		CREATE TABLE IF NOT EXISTS costumes (
 			id TEXT PRIMARY KEY,
 			slug TEXT UNIQUE NOT NULL,
@@ -60,9 +51,8 @@ const ensureTables = async (sql: NeonQueryFunction<false, false>) => {
 			created_at TIMESTAMPTZ DEFAULT NOW(),
 			updated_at TIMESTAMPTZ DEFAULT NOW()
 		)
-	`
-
-	await sql`
+	`;
+    await sql `
 		CREATE TABLE IF NOT EXISTS costume_assets (
 			id TEXT PRIMARY KEY,
 			costume_id TEXT REFERENCES costumes(id) ON DELETE CASCADE,
@@ -72,15 +62,11 @@ const ensureTables = async (sql: NeonQueryFunction<false, false>) => {
 			sort_order INTEGER DEFAULT 0,
 			created_at TIMESTAMPTZ DEFAULT NOW()
 		)
-	`
-}
-
-const upsertCategories = async (
-	sql: NeonQueryFunction<false, false>,
-	categories: Map<string, { id: string; name: string; description?: string; count: number }>,
-) => {
-	for (const [slug, category] of Array.from(categories.entries())) {
-		await sql`
+	`;
+};
+const upsertCategories = async (sql, categories) => {
+    for (const [slug, category] of Array.from(categories.entries())) {
+        await sql `
 			INSERT INTO costume_categories (id, slug, name, description, sort_order, is_active, updated_at)
 			VALUES (${category.id}, ${slug}, ${category.name}, ${category.description ?? null}, ${category.count}, true, NOW())
 			ON CONFLICT (id) DO UPDATE SET
@@ -89,21 +75,11 @@ const upsertCategories = async (
 				sort_order = EXCLUDED.sort_order,
 				is_active = EXCLUDED.is_active,
 				updated_at = NOW()
-		`
-	}
-}
-
-interface UpsertOptions {
-	preserveAssets?: boolean
-}
-
-const upsertCostume = async (
-	sql: NeonQueryFunction<false, false>,
-	costume: Awaited<ReturnType<typeof loadCostumePresets>>[number],
-	categoryId: string,
-	options: UpsertOptions = {},
-) => {
-	await sql`
+		`;
+    }
+};
+const upsertCostume = async (sql, costume, categoryId, options = {}) => {
+    await sql `
 		INSERT INTO costumes (
 			id,
 			slug,
@@ -160,26 +136,21 @@ const upsertCostume = async (
 			is_new = EXCLUDED.is_new,
 			is_featured = EXCLUDED.is_featured,
 			updated_at = NOW()
-	`
-
-	if (options.preserveAssets) {
-		console.log(`Skipping asset sync for costume ${costume.id} (preserve-assets enabled)`)
-		return
-	}
-
-	await sql`DELETE FROM costume_assets WHERE costume_id = ${costume.id}`
-
-	const BASE_URL = "https://f004.backblazeb2.com/file/waifu-test/"
-
-		function normalizeAssetUrl(url: string) {
-		if (url.startsWith("assets/")) {
-			return url.replace(/^assets\//, BASE_URL)
-		}
-		return url
-		}
-
-	for (const [index, asset] of (costume.assets as CostumeAsset[]).entries()) {
-		await sql`
+	`;
+    if (options.preserveAssets) {
+        console.log(`Skipping asset sync for costume ${costume.id} (preserve-assets enabled)`);
+        return;
+    }
+    await sql `DELETE FROM costume_assets WHERE costume_id = ${costume.id}`;
+    const BASE_URL = "https://f004.backblazeb2.com/file/waifu-test/";
+    function normalizeAssetUrl(url) {
+        if (url.startsWith("assets/")) {
+            return url.replace(/^assets\//, BASE_URL);
+        }
+        return url;
+    }
+    for (const [index, asset] of Array.from(costume.assets.entries())) {
+        await sql `
 			INSERT INTO costume_assets (
 				id,
 				costume_id,
@@ -204,56 +175,47 @@ const upsertCostume = async (
 				description = EXCLUDED.description,
 				sort_order = EXCLUDED.sort_order,
 				created_at = EXCLUDED.created_at
-		`
-	}
-}
-
+		`;
+    }
+};
 const main = async () => {
-	const sql = createSqlClient()
-	const args = new Set(process.argv.slice(2))
-	const preserveAssets = args.has('--preserve-assets') || process.env.PRESERVE_ASSETS === 'true'
-
-	try {
-		console.log('Seeding Neon costumes...')
-		if (preserveAssets) {
-			console.log('Asset preservation mode enabled; existing costume_assets rows will remain untouched.')
-		}
-		await ensureTables(sql)
-
-		const presets = await loadCostumePresets()
-		const categories = new Map<string, { id: string; name: string; description?: string; count: number }>()
-
-		for (const preset of presets) {
-			const slug = slugify(preset.category || 'evergreen')
-			if (!categories.has(slug)) {
-				categories.set(slug, {
-					id: `cat_${slug || 'general'}`,
-					name: sentenceCase(preset.category || 'Evergreen'),
-					description: `${sentenceCase(preset.category || 'Evergreen')} themed costumes`,
-					count: 0,
-				})
-			}
-			const category = categories.get(slug)!
-			category.count += 1
-		}
-
-		await upsertCategories(sql, categories)
-
-		let assetCount = 0
-		for (const preset of presets) {
-			const slug = slugify(preset.category || 'evergreen')
-			const category = categories.get(slug)!
-			await upsertCostume(sql, preset, category.id, { preserveAssets })
-			assetCount += preset.assets.length
-		}
-
-		console.log(
-			`Completed Neon seed: ${presets.length} costumes, ${categories.size} categories, ${assetCount} assets`,
-		)
-	} catch (error) {
-		console.error('Failed to seed Neon costumes:', error)
-		process.exitCode = 1
-	}
-}
-
-void main()
+    const sql = createSqlClient();
+    const args = new Set(process.argv.slice(2));
+    const preserveAssets = args.has('--preserve-assets') || process.env.PRESERVE_ASSETS === 'true';
+    try {
+        console.log('Seeding Neon costumes...');
+        if (preserveAssets) {
+            console.log('Asset preservation mode enabled; existing costume_assets rows will remain untouched.');
+        }
+        await ensureTables(sql);
+        const presets = await loadCostumePresets();
+        const categories = new Map();
+        for (const preset of presets) {
+            const slug = slugify(preset.category || 'evergreen');
+            if (!categories.has(slug)) {
+                categories.set(slug, {
+                    id: `cat_${slug || 'general'}`,
+                    name: sentenceCase(preset.category || 'Evergreen'),
+                    description: `${sentenceCase(preset.category || 'Evergreen')} themed costumes`,
+                    count: 0,
+                });
+            }
+            const category = categories.get(slug);
+            category.count += 1;
+        }
+        await upsertCategories(sql, categories);
+        let assetCount = 0;
+        for (const preset of presets) {
+            const slug = slugify(preset.category || 'evergreen');
+            const category = categories.get(slug);
+            await upsertCostume(sql, preset, category.id, { preserveAssets });
+            assetCount += preset.assets.length;
+        }
+        console.log(`Completed Neon seed: ${presets.length} costumes, ${categories.size} categories, ${assetCount} assets`);
+    }
+    catch (error) {
+        console.error('Failed to seed Neon costumes:', error);
+        process.exitCode = 1;
+    }
+};
+void main();

@@ -94,9 +94,10 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
 
   const CostumeCard = ({ costume }: { costume: CostumePreset }) => {
     const thumbnail =
-      costume.assets.find(asset => asset.type === 'example') ||
-      costume.assets.find(asset => asset.type === 'main') ||
-      costume.assets[0]
+      (costume.assets && costume.assets.find(asset => asset.type === 'example')) ||
+      (costume.assets && costume.assets.find(asset => asset.type === 'main')) ||
+      (costume.assets && costume.assets[0]) ||
+      null
 
     return (
       <Card 
@@ -125,7 +126,7 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
       
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">{costume.name}</h3>
+          <h3 className="font-semibold text-lg">{costume.name || costume.id}</h3>
           <div className="flex gap-1">
             {costume.isNew && (
               <Badge variant="secondary" className="text-xs">NEW</Badge>
@@ -137,12 +138,12 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
         </div>
         
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {costume.marketing.shortDescription}
+          {costume.marketing?.shortDescription || 'Transform into this amazing costume!'}
         </p>
         
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap gap-1">
-            {costume.metadata.tags.slice(0, 3).map(tag => (
+            {(costume.metadata?.tags || []).slice(0, 3).map(tag => (
               <Badge key={tag} variant="outline" className="text-xs">
                 {tag}
               </Badge>
@@ -150,7 +151,7 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
           </div>
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <span className="flex items-center">
-              ⏱️ {costume.metadata.estimatedProcessingTime}s
+              ⏱️ {costume.metadata?.estimatedProcessingTime || 45}s
             </span>
           </div>
         </div>

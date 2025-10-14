@@ -75,9 +75,10 @@ Architecture
 - Reference image bundles per costume sent alongside the user selfie.
 
 ### Data & content
-- Costume catalog initially loaded from `src/constants/costumes.ts` (JSON-like module).
+- Costume catalog loaded from Neon PostgreSQL database with local JSON fallback.
 - Each costume entry defines metadata, prompts, reference images (2–4), and affiliate links.
-- Roadmap includes migrating catalog + analytics to Neon or Supabase with an accompanying dashboard.
+- Database seeding via `bun run scripts/seed-neon-costumes.ts` from root directory.
+- API server runs via `bun run server/api/index.ts` (must run from root to load `.env` properly).
 
 ### Hosting & deployment
 - Primary target: **Vercel** (build command `bun run build`, output `dist`).
@@ -148,8 +149,9 @@ Development Workflow
 Environment Setup
 -----------------
 
-Required variables (configure in `.env.local` or Vercel project settings):
+Required variables (configure in `.env` for local development or Vercel project settings):
 
+### Frontend Variables
 | Variable | Purpose |
 | --- | --- |
 | `VITE_GEMINI_PROXY_URL` | Overrides default `/api/gemini/generate-content` if needed. |
@@ -158,25 +160,75 @@ Required variables (configure in `.env.local` or Vercel project settings):
 | `VITE_DEFAULT_MODEL` | Model id to preselect (e.g., `seedream-v4`). |
 | `VITE_AFFILIATE_DISCLOSURE` | Optional disclosure copy override. |
 | `VITE_EMAIL_ENDPOINT` | Endpoint to receive email opt-ins (stub-friendly; default logs to console). |
+| `VITE_API_BASE_URL` | Base URL for the costume API server (default: `http://localhost:4000`). |
+
+### Backend Variables (API Server)
+| Variable | Purpose |
+| --- | --- |
+| `NEON_DATABASE_URL` | PostgreSQL connection string for Neon database (required for API server). |
+| `NEON_DATABASE_URL_READONLY` | Read-only connection string (optional, falls back to `NEON_DATABASE_URL`). |
+| `API_ALLOW_ORIGIN` | CORS allowed origins (default: `*`). |
+| `LOG_SINK` | Log destination (default: `stdout`). |
+
+### Example .env File
+```env
+# Frontend
+VITE_DEFAULT_MODEL=seedream-v4
+VITE_API_BASE_URL=http://localhost:4000
+
+# Backend - Neon Database
+NEON_DATABASE_URL="postgresql://neondb_owner:password@ep-example.us-west-2.aws.neon.tech/neondb?sslmode=require"
+
+# Development
+RUN_NANO_GPT_INTEGRATION=true
+VITE_DEBUG_SELFIE_ONLY=false
+```
 
 Running the App
 ---------------
 
-Install & run (Bun – preferred):
+Install dependencies:
 
 ```sh
 bun install
+```
+
+### Frontend Development
+
+```sh
 bun run dev
 ```
 
-Install & run (npm – fallback):
+### API Server (Neon Database)
+
+The API server serves costume data from Neon PostgreSQL with local JSON fallback:
 
 ```sh
-npm ci
-npm run dev
+# From root directory (IMPORTANT - must run from root to load .env properly)
+bun run server/api/index.ts
+
+# Or use the npm script:
+bun run serve:api
 ```
 
-> Bun blocks certain native postinstall scripts by default. If prompted, inspect `bun pm untrusted` and trust known libraries (e.g., `@swc/core`) with `bun pm trust`.
+> **Critical**: The API server must be run from the root directory to properly load environment variables from `.env`. Running from `server/` directory will cause fallback to local JSON data.
+
+### Database Seeding
+
+Seed the Neon database with costume data:
+
+```sh
+# From root directory
+bun run scripts/seed-neon-costumes.ts
+
+# Or use the npm script:
+bun run seed:costumes
+```
+
+Optional flags:
+- `--preserve-assets`: Update costume data but keep existing assets
+
+### Build & Deploy
 
 Build artifacts (Vercel-compatible):
 
@@ -190,7 +242,7 @@ Fallback:
 npm run build
 ```
 
-Outputs land in `dist/`. Deploy that directory or rely on Vercel’s static output.
+Outputs land in `dist/`. Deploy that directory or rely on Vercel's static output.
 
 Testing & QA
 ------------
@@ -198,6 +250,31 @@ Testing & QA
 - Lint: `bun run lint` (or `npm run lint`).
 - Unit tests (coming soon) will live under `src/__tests__` and execute via `bun test`.
 - Manual QA checklist lives in `docs/TODO.md` (kept evergreen per feature branch).
+
+## Troubleshooting
+
+### API Server Issues
+
+**Problem**: API returns legacy format with `display_name` instead of `name`, and `assets: null`
+
+**Solution**: The API server is falling back to local JSON data instead of using Neon database.
+
+1. **Check environment variables**: Ensure `NEON_DATABASE_URL` is set in `.env`
+2. **Run from correct directory**: Always run the API server from root directory:
+   ```bash
+   # ✅ Correct (from root)
+   bun run server/api/index.ts
+   
+   # ❌ Wrong (from server directory)
+   cd server && bun run api/index.ts
+   ```
+3. **Verify database connection**: Test with direct database query
+4. **Check seeding**: Ensure database is seeded: `bun run scripts/seed-neon-costumes.ts`
+
+**Common Error Messages**:
+- `name: null` and `assets: "null"` → Environment variables not loaded
+- Legacy field names (`display_name`, `reference_image_url`) → Fallback to local JSON
+- Empty costume list → Database connection failed or not seeded
 
 Logging & Analytics
 -------------------
