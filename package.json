@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "seed:costumes": "bun run scripts/seed-neon-costumes.ts",
-    "serve:api": "bun run server/api/index.ts"
+    "serve:api": "bun --env-file=.env run server/api/index.ts",
+    "dev:full": "concurrently \"bun run serve:api\" \"bun run dev\"",
+    "dev:check": "node scripts/check-dev-setup.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
