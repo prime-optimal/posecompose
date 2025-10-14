@@ -26,7 +26,7 @@ dist-ssr
 # Internal project files
 .factory/
 AGENTS.md
-docs/
+docs/*.md
 
 # Phase management and internal tracking
 SUBPHASE_*/
