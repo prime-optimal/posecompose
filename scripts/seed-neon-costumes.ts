@@ -1,5 +1,5 @@
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
-import { loadCostumePresets } from './utils/costume-loader'
+import { loadCostumePresets } from './utils/costume-loader.js'
 
 const slugify = (value: string) =>
 	value
@@ -24,7 +24,7 @@ const createSqlClient = () => {
 	return neon(url)
 }
 
-const ensureTables = async (sql: NeonQueryFunction) => {
+const ensureTables = async (sql: NeonQueryFunction<false, false>) => {
 	await sql`
 		CREATE TABLE IF NOT EXISTS costume_categories (
 			id TEXT PRIMARY KEY,
@@ -75,10 +75,10 @@ const ensureTables = async (sql: NeonQueryFunction) => {
 }
 
 const upsertCategories = async (
-	sql: NeonQueryFunction,
+	sql: NeonQueryFunction<false, false>,
 	categories: Map<string, { id: string; name: string; description?: string; count: number }>,
 ) => {
-	for (const [slug, category] of categories.entries()) {
+	for (const [slug, category] of Array.from(categories.entries())) {
 		await sql`
 			INSERT INTO costume_categories (id, slug, name, description, sort_order, is_active, updated_at)
 			VALUES (${category.id}, ${slug}, ${category.name}, ${category.description ?? null}, ${category.count}, true, NOW())
@@ -92,10 +92,15 @@ const upsertCategories = async (
 	}
 }
 
+interface UpsertOptions {
+	preserveAssets?: boolean
+}
+
 const upsertCostume = async (
-	sql: NeonQueryFunction,
+	sql: NeonQueryFunction<false, false>,
 	costume: Awaited<ReturnType<typeof loadCostumePresets>>[number],
 	categoryId: string,
+	options: UpsertOptions = {},
 ) => {
 	await sql`
 		INSERT INTO costumes (
@@ -156,9 +161,23 @@ const upsertCostume = async (
 			updated_at = NOW()
 	`
 
+	if (options.preserveAssets) {
+		console.log(`Skipping asset sync for costume ${costume.id} (preserve-assets enabled)`)
+		return
+	}
+
 	await sql`DELETE FROM costume_assets WHERE costume_id = ${costume.id}`
 
-	for (const [index, asset] of costume.assets.entries()) {
+	const BASE_URL = "https://f004.backblazeb2.com/file/waifu-test/"
+
+		function normalizeAssetUrl(url: string) {
+		if (url.startsWith("assets/")) {
+			return url.replace(/^assets\//, BASE_URL)
+		}
+		return url
+		}
+
+	for (const [index, asset] of Array.from(costume.assets.entries())) {
 		await sql`
 			INSERT INTO costume_assets (
 				id,
@@ -172,7 +191,7 @@ const upsertCostume = async (
 			VALUES (
 				${asset.id},
 				${costume.id},
-				${asset.url},
+				${normalizeAssetUrl(asset.url)},
 				${asset.type},
 				${asset.description ?? null},
 				${index},
@@ -190,9 +209,14 @@ const upsertCostume = async (
 
 const main = async () => {
 	const sql = createSqlClient()
+	const args = new Set(process.argv.slice(2))
+	const preserveAssets = args.has('--preserve-assets') || process.env.PRESERVE_ASSETS === 'true'
 
 	try {
 		console.log('Seeding Neon costumes...')
+		if (preserveAssets) {
+			console.log('Asset preservation mode enabled; existing costume_assets rows will remain untouched.')
+		}
 		await ensureTables(sql)
 
 		const presets = await loadCostumePresets()
@@ -218,7 +242,7 @@ const main = async () => {
 		for (const preset of presets) {
 			const slug = slugify(preset.category || 'evergreen')
 			const category = categories.get(slug)!
-			await upsertCostume(sql, preset, category.id)
+			await upsertCostume(sql, preset, category.id, { preserveAssets })
 			assetCount += preset.assets.length
 		}
 

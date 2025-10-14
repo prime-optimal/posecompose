@@ -1,10 +1,23 @@
-import { promises as fs } from 'node:fs'
-import path from 'node:path'
+import { promises as fs } from 'fs'
+import * as path from 'path'
 import type {
 	CostumeAffiliateLink,
 	CostumeAsset,
 	CostumePreset,
-} from '../../src/types/costume'
+} from '../../src/types/costume.js'
+
+type LegacyReferenceImage =
+	| string
+	| {
+		path?: string
+		url?: string
+		type?: CostumeAsset['type']
+		description?: string
+		primary?: boolean
+		main?: boolean
+		example?: boolean
+		is_example?: boolean
+	}
 
 interface LegacyCostume {
 	id: string
@@ -16,10 +29,10 @@ interface LegacyCostume {
 	affiliate_url?: string
 	tags: string[]
 	model_id?: string
-	reference_images?: string[]
+	reference_images?: LegacyReferenceImage[]
 }
 
-const PROJECT_ROOT = path.resolve(import.meta.dir, '../..')
+const PROJECT_ROOT = path.resolve(__dirname, '../..')
 const COSTUME_JSON_PATH = path.join(PROJECT_ROOT, 'costumes.json')
 const ASSETS_ROOT = path.join(PROJECT_ROOT, 'assets')
 const PRIMARY_KEYWORDS = ['square', 'profile', 'front']
@@ -103,60 +116,125 @@ const toAffiliateSource = (url?: string): CostumeAffiliateLink['source'] => {
 	}
 }
 
+interface ReferenceEntry {
+	webPath: string
+	filename: string
+	description?: string
+	typeHint?: CostumeAsset['type']
+	primaryHint?: boolean
+}
+
+const resolveReferenceImage = async (
+	referenceImage: LegacyReferenceImage,
+): Promise<ReferenceEntry | null> => {
+	const entry = typeof referenceImage === 'string' ? { path: referenceImage } : referenceImage
+	const source = entry.path ?? entry.url
+	if (!source) {
+		return null
+	}
+
+	const normalizedSource = source.replace(/^\.\//, '')
+	const isRemote = /^https?:\/\//i.test(normalizedSource)
+	let absolutePath: string
+	let webPath: string
+
+	if (isRemote) {
+		absolutePath = normalizedSource
+		webPath = normalizedSource
+	} else {
+		absolutePath = path.isAbsolute(normalizedSource)
+			? normalizedSource
+			: path.join(PROJECT_ROOT, normalizedSource)
+
+		if (!absolutePath.startsWith(ASSETS_ROOT)) {
+			return null
+		}
+
+		if (!(await fileExists(absolutePath))) {
+			return null
+		}
+
+		webPath = toWebPath(absolutePath)
+	}
+
+	const filename = (() => {
+		if (isRemote) {
+			try {
+				return path.basename(new URL(normalizedSource).pathname)
+			} catch {
+				return normalizedSource
+			}
+		}
+		return path.basename(absolutePath)
+	})()
+
+	const description = entry.description ?? sentenceCase(path.parse(filename).name)
+	const typeHint = entry.type
+		?? (entry.example || entry.is_example ? 'example' : undefined)
+		?? (entry.main ? 'main' : undefined)
+	const primaryHint = Boolean(entry.primary ?? entry.main)
+
+	return {
+		webPath,
+		filename,
+		description,
+		typeHint,
+		primaryHint,
+	}
+}
+
 const gatherReferenceAssets = async (
 	costume: LegacyCostume,
 ): Promise<CostumeAsset[]> => {
 	const seen = new Set<string>()
-	const entries: { absolute: string; webPath: string; filename: string }[] = []
+	const entries: ReferenceEntry[] = []
 	const referenceImages = costume.reference_images ?? []
 
 	for (const referenceImage of referenceImages) {
-		const normalized = referenceImage.replace(/^\.\//, '')
-		const absolutePath = path.isAbsolute(normalized)
-			? normalized
-			: path.join(PROJECT_ROOT, normalized)
-
-		if (!absolutePath.startsWith(ASSETS_ROOT)) {
+		const resolved = await resolveReferenceImage(referenceImage)
+		if (!resolved) {
 			continue
 		}
 
-		if (!(await fileExists(absolutePath))) {
+		if (seen.has(resolved.webPath)) {
 			continue
 		}
 
-		const webPath = toWebPath(absolutePath)
-		if (seen.has(webPath)) {
-			continue
-		}
-
-		seen.add(webPath)
-		entries.push({
-			absolute: absolutePath,
-			webPath,
-			filename: path.basename(absolutePath),
-		})
+		seen.add(resolved.webPath)
+		entries.push(resolved)
 	}
 
 	if (!entries.length && costume.reference_image_url) {
-		entries.push({
-			absolute: costume.reference_image_url,
-			webPath: costume.reference_image_url,
-			filename: path.basename(costume.reference_image_url),
-		})
+		const resolved = await resolveReferenceImage({ url: costume.reference_image_url, main: true })
+		if (resolved) {
+			entries.push(resolved)
+		}
 	}
 
 	const primaryEntry =
-		entries.find(entry =>
+		entries.find(entry => entry.typeHint === 'main' || entry.primaryHint)
+		|| entries.find(entry =>
 			PRIMARY_KEYWORDS.some(keyword => entry.filename.toLowerCase().includes(keyword)),
 		)
 		|| entries[0]
 
-	return entries.map((entry, index) => ({
-		id: `${costume.id}-asset-${index}`,
-		url: entry.webPath,
-		type: primaryEntry && entry.webPath === primaryEntry.webPath ? 'main' : 'detail',
-		description: sentenceCase(path.parse(entry.filename).name),
-	}))
+	if (costume.thumbnail_url && !entries.some(entry => entry.webPath === costume.thumbnail_url)) {
+		const thumbnailEntry = await resolveReferenceImage({ url: costume.thumbnail_url, type: 'example' })
+		if (thumbnailEntry && !seen.has(thumbnailEntry.webPath)) {
+			entries.unshift(thumbnailEntry)
+		}
+	}
+
+	return entries.map((entry, index) => {
+		const derivedType: CostumeAsset['type'] = entry.typeHint || (primaryEntry && entry.webPath === primaryEntry.webPath ? 'main' : 'detail') || 'detail'
+
+		return {
+			id: `${costume.id}-asset-${index}`,
+			url: entry.webPath,
+			type: derivedType,
+			description: entry.description,
+		}
+	})
 }
 
 const buildAffiliateLinks = (costume: LegacyCostume): CostumeAffiliateLink[] => {
@@ -181,8 +259,8 @@ export const loadCostumePresets = async (): Promise<CostumePreset[]> => {
 
 	const presets: CostumePreset[] = []
 
-	for (const [index, costume] of legacyCostumes.entries()) {
-		const assets = await gatherReferenceAssets(costume)
+	for (const [index, costume] of Array.from(legacyCostumes.entries())) {
+	const assets = await gatherReferenceAssets(costume)
 		const palette = pickPalette(costume.id)
 
 		const mainAsset = assets.find(asset => asset.type === 'main')
@@ -190,17 +268,8 @@ export const loadCostumePresets = async (): Promise<CostumePreset[]> => {
 			assets.unshift({
 				id: `${costume.id}-remote-main`,
 				url: costume.reference_image_url,
-				type: 'main',
+				type: 'main' as const,
 				description: `${costume.display_name} reference`,
-			})
-		}
-
-		if (costume.thumbnail_url && !assets.some(asset => asset.url === costume.thumbnail_url)) {
-			assets.push({
-				id: `${costume.id}-thumbnail`,
-				url: costume.thumbnail_url,
-				type: 'example',
-				description: `${costume.display_name} thumbnail`,
 			})
 		}
 

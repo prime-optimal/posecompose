@@ -2,19 +2,18 @@
   {
     "id": "daisy-bodysuit",
     "display_name": "Princess Daisy (Bodysuit)",
-    "prompt": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+    "prompt": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
     "negative_prompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
-    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy/daisy-bodysuit/daisy-wins.png",
-    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy/daisy-bodysuit/daisy-wins.png",
+    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-front.jpg",
+    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-wins.png",
     "affiliate_url": "https://amzn.to/4pU7mp3",
     "tags": ["princess", "daisy", "super-mario", "yellow"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/daisy-bodysuit/daisy-bodysuit-front.jpg",
-      "assets/costumes/daisy-bodysuit/daisy-bodysuit-back.jpg",
-      "assets/costumes/daisy-bodysuit/daisy-bodysuit-crown.jpg",
-      "assets/costumes/daisy-bodysuit/daisy-bodysuit-layout.jpg",
-      "assets/costumes/daisy-bodysuit/daisy-bodysuit-buckle.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-crown.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-layout.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-buckle.jpg"
     ]
   },
   {
@@ -22,17 +21,17 @@
     "display_name": "Princess Peach (Tennis Skirt)",
     "prompt": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
     "negative_prompt": "low quality, cartoonish, distorted anatomy, casual clothing, duplicate face, watermark",
-    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/princess-peach/peach-skirt/princess-peach-skirt.square.png",
-    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/princess-peach/peach-skirt/princess-peach-skirt.square.png",
+    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-front.jpg",
+    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-square.png",
     "affiliate_url": "https://amzn.to/48Mbilu",
     "tags": ["princess-peach", "super-mario", "nintendo", "pink"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/peach-skirt/princess-peach-skirt-front.jpg",
-      "assets/costumes/peach-skirt/princess-peach-skirt-back.jpg",
-      "assets/costumes/peach-skirt/princess-peach-profile.jpg",
-      "assets/costumes/peach-skirt/princess-peach-side.jpg",
-      "assets/costumes/peach-skirt/princess-peach-accessories.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-front.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-profile.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-side.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-accessories.jpg"
     ]
   },
   {
@@ -46,15 +45,15 @@
     "tags": ["bowsette", "super-mario", "nintendo", "bowser", "black"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/bowsette/bowsette-front.jpg",
-      "assets/costumes/bowsette/bowsette-profile.jpg",
-      "assets/costumes/bowsette/bowsette-arms-up.jpg",
-      "assets/costumes/bowsette/bowsette-horns.jpg",
-      "assets/costumes/bowsette/bowsette-crown.jpg",
-      "assets/costumes/bowsette/bowsette-skirt.jpg",
-      "assets/costumes/bowsette/bowsette-wig.jpg",
-      "assets/costumes/bowsette/bowsette-head.png",
-      "assets/costumes/bowsette/bowsette-blurred.png"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-front.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-profile.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-arms-up.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-horns.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-crown.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-skirt.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-wig.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-head.png",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-blurred.png"
     ]
   },
     {
@@ -68,9 +67,9 @@
     "tags": ["chun-li", "street-fighter", "capcom", "blue", "black"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/chun-li-classic/chun-classic-front.jpg",
-      "assets/costumes/chun-li-classic/chun-classic-back.jpg",
-      "assets/costumes/chun-li-classic/chun-black-front.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-classic-front.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-classic-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-black-front.jpg"
     ]
   },
   {
@@ -84,10 +83,10 @@
     "tags": ["princess-rosalina", "mario-kart", "nintendo", "blue", "rosalina"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/rosalina/rosalina-profile.jpg",
-      "assets/costumes/rosalina/rosalina-strip.jpg",
-      "assets/costumes/rosalina/rosalina-strip-back.jpg",
-      "assets/costumes/rosalina/rosalina-layout.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-profile.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-strip.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-strip-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-layout.jpg"
     ]
   },
     {
@@ -101,10 +100,10 @@
     "tags": ["kitana", "mortal-kombat", "ninja", "blue", "nether-realm"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/kitana/kitana-profile.jpg",
-      "assets/costumes/kitana/kitana-closeup.jpg",
-      "assets/costumes/kitana/kitana-side-back.jpg",
-      "assets/costumes/kitana/kitana-included.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-profile.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-closeup.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-side-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-included.jpg"
     ]
   },
     {
@@ -112,17 +111,17 @@
     "display_name": "Princess Daisy (Skirt)",
     "prompt": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
     "negative_prompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
-    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy/daisy-skirt/daisy-profile.jpeg",
-    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy/daisy-skirt/daisy-profile.jpeg",
+    "reference_image_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-bg-removed.jpeg",
+    "thumbnail_url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-profile.png",
     "affiliate_url": "https://amzn.to/46Gxn3u",
     "tags": ["princess", "daisy", "super-mario", "yellow"],
     "model_id": "seedream-v4",
     "reference_images": [
-      "assets/costumes/daisy-skirt/daisy-front.jpg",
-      "assets/costumes/daisy-skirt/daisy-back.jpg",
-      "assets/costumes/daisy-skirt/daisy-profile.jpeg",
-      "assets/costumes/daisy-skirt/daisy-layout.jpg",
-      "assets/costumes/daisy-skirt/daisy-bow.jpg"
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-front.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-back.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-profile.jpeg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-layout.jpg",
+      "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-bow.jpg"
     ]
   }
 ]

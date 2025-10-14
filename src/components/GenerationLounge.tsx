@@ -186,8 +186,8 @@ export const GenerationLounge = ({
 			model,
 			selfieBase64,
 			selfieMimeType: uploadedSelfie?.type ?? null,
-			includeFallback: model !== 'background-remover',
-		})
+			includeFallback: model === 'background-remover' && !selfieBase64,
+	})
 
 				if (!references.length) {
 					throw new Error('No reference assets available for Nano GPT request')
@@ -195,6 +195,31 @@ export const GenerationLounge = ({
 
 				const prompt = buildPromptFromCostume(selectedCostume)
 				const negativePrompt = selectedCostume.transformation.negativePrompts?.join(', ')
+
+	logEvent('generation_prompt_composed', {
+		costumeId: selectedCostume.id,
+		costumeName: selectedCostume.name,
+		model,
+		prompt,
+		negativePrompt,
+				includesUserSelfie: references.some(reference => reference.role === 'user'),
+				userSelfieKind: references.find(reference => reference.role === 'user')?.kind ?? null,
+				userSelfieBytes:
+					references
+						.find(reference => reference.role === 'user' && reference.kind === 'base64')?.value
+						?.length ?? null,
+				costumeReferenceCount: references.filter(reference => reference.role === 'costume').length,
+				referenceSummary: references.map(reference => ({
+					id: reference.id,
+					role: reference.role,
+					kind: reference.kind,
+					hasInlineData: reference.kind === 'base64',
+					inlineLength: reference.kind === 'base64' ? reference.value.length : null,
+					mimeType: reference.mimeType ?? null,
+					value: reference.kind === 'url' ? reference.value : undefined,
+					weight: reference.weight ?? null,
+				})),
+	})
 
 				logEvent('generation_request_dispatched', {
 					costumeId: selectedCostume.id,

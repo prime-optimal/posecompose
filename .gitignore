@@ -60,3 +60,6 @@ temp/
 
 # Local development
 .envrc
+
+# Costume images
+assets/costumes/

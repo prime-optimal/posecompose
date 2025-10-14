@@ -28,6 +28,11 @@ Rebrand the existing experience into Waifu Material and deliver a polished Hallo
 5. **Instrumentation & Data Hooks**  _(affiliates-comms-droid + ai-pipeline-droid)_
    - Extend logging events (selection, email, generation, affiliate clicks, social shares).
    - Stub email submission endpoint integration.
+   - Document how the default costume image is selected and how to change it.
+   - Document which generation endpoint is invoked after selfie upload.
+   - Document logging for prompts sent to providers, including user photo and costume assets.
+   - Document how to update each costume's prompt and included reference images.
+   - Maintain instrumentation source of truth under `docs/instrumentation/` for future updates.
 
 6. **Documentation & Ops**  _(ops-docs-droid)_
    - Keep README, AGENTS.md, CHANGELOG.md, docs/TODO.md synchronized.

@@ -1,12 +1,12 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
 import {
 	getAllCostumes,
 	getCostumeById,
 	getFeaturedCostumes,
-} from './neon-client'
+} from './neon-client.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.dirname(fileURLToPath(import.meta.url!))
 const PROJECT_ROOT = path.resolve(__dirname, '..')
 const ASSET_ROOT = path.join(PROJECT_ROOT, 'assets')
 
@@ -96,12 +96,15 @@ const serveStaticAsset = async (pathname: string, origin: string) => {
 		return notFound(origin)
 	}
 
-	const file = Bun.file(absolutePath)
-	if (!(await file.exists())) {
+	const fs = await import('fs/promises')
+	try {
+		await fs.access(absolutePath)
+	} catch {
 		return notFound(origin)
 	}
 
-	const response = new Response(file, {
+	const file = await fs.readFile(absolutePath)
+	const response = new Response(file as any, {
 		headers: {
 			'Cache-Control': 'public, max-age=604800, immutable',
 		},
@@ -195,7 +198,7 @@ const handleLogIngest = async (request: Request, origin: string) => {
 
 const server = Bun.serve({
 	port: API_PORT,
-	fetch: async request => {
+	fetch: async (request: Request) => {
 		const { method } = request
 		const url = new URL(request.url)
 		const requestOrigin = request.headers.get('origin')

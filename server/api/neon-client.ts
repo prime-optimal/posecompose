@@ -1,11 +1,11 @@
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
-import type { CostumeAsset, CostumePreset } from '../src/types/costume'
-import { loadCostumePresets } from '../scripts/utils/costume-loader'
+import type { CostumeAsset, CostumePreset } from '../../src/types/costume.js'
+import { loadCostumePresets } from '../../scripts/utils/costume-loader.js'
 
 const connectionString =
 	process.env.NEON_DATABASE_URL_READONLY ?? process.env.NEON_DATABASE_URL ?? ''
 
-let cachedSql: NeonQueryFunction | null = null
+let cachedSql: NeonQueryFunction<false, false> | null = null
 
 interface DBAssetRow {
 	id: string
@@ -93,13 +93,13 @@ const mapCostumeRow = (row: DBCostumeRow, assets: CostumeAsset[]): CostumePreset
 	inspiration: row.inspiration ?? undefined,
 })
 
-const fetchAssetsForCostume = async (sql: NeonQueryFunction, costumeId: string) => {
-	const rows = await sql<DBAssetRow[]>`
+const fetchAssetsForCostume = async (sql: NeonQueryFunction<false, false>, costumeId: string) => {
+	const rows = await sql`
 		SELECT id, url, type, description
 		FROM costume_assets
 		WHERE costume_id = ${costumeId}
 		ORDER BY sort_order ASC, created_at ASC
-	`
+	` as DBAssetRow[]
 
 	return rows.map(mapAssetRow)
 }
@@ -110,12 +110,12 @@ const fetchCostumesFromNeon = async (): Promise<CostumePreset[]> => {
 		return []
 	}
 
-	const rows = await sql<DBCostumeRow[]>`
+	const rows = await sql`
 		SELECT *
 		FROM costumes
 		WHERE is_active = true
 		ORDER BY sort_order ASC NULLS LAST, created_at DESC
-	`
+	` as DBCostumeRow[]
 
 	const costumes: CostumePreset[] = []
 	for (const row of rows) {
@@ -132,12 +132,12 @@ const fetchCostumeFromNeon = async (id: string): Promise<CostumePreset | null> =
 		return null
 	}
 
-	const rows = await sql<DBCostumeRow[]>`
+	const rows = await sql`
 		SELECT *
 		FROM costumes
 		WHERE id = ${id}
 		LIMIT 1
-	`
+	` as DBCostumeRow[]
 
 	const row = rows[0]
 	if (!row) {

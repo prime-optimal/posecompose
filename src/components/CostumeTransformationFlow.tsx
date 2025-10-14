@@ -82,16 +82,30 @@ const CostumeTransformationFlow = () => {
   }, [currentStep, logInfo]);
 
   // Convert file to base64
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(',')[1]); // Remove data:image/jpeg;base64, prefix
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+	const fileToBase64 = (file: File): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const result = reader.result as string;
+				const base64 = result.split(',')[1];
+				logEvent('selfie_base64_ready', {
+					fileName: file.name,
+					fileSize: file.size,
+					fileType: file.type,
+					base64Length: base64?.length ?? 0,
+				});
+				resolve(base64);
+			};
+			reader.onerror = error => {
+				logError('selfie_base64_failed', error, {
+					fileName: file.name,
+					fileSize: file.size,
+					fileType: file.type,
+				});
+				reject(error);
+			};
+			reader.readAsDataURL(file);
+		});
   };
 
   const handleCostumeSelect = (costume: CostumePreset) => {

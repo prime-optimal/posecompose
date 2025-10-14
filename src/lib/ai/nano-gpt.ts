@@ -173,6 +173,17 @@ export class NanoGptProvider {
 			: 0
 		let lastError: unknown
 
+		logEvent('nano_gpt_payload_ready', {
+			model: request.model,
+			referenceCount,
+			imageDataUrlBytes: typeof requestBody.imageDataUrl === 'string'
+				? requestBody.imageDataUrl.length
+				: null,
+			additionalReferenceCount: Array.isArray(requestBody.imageDataUrls)
+				? requestBody.imageDataUrls.length
+				: 0,
+		})
+
 		for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
 			try {
 				logEvent('nano_gpt_generation_started', {

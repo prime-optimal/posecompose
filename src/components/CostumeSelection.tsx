@@ -85,30 +85,36 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
     }
   };
 
-  const CostumeCard = ({ costume }: { costume: CostumePreset }) => (
-    <Card 
-      className={`p-4 cursor-pointer transition-all duration-200 hover:scale-105 ${
-        activeCostume === costume.id 
-          ? 'ring-2 ring-primary ring-offset-2 bg-primary/5' 
-          : 'hover:bg-accent'
-      }`}
-      onClick={() => handleCostumeSelect(costume)}
-    >
-      <div className="aspect-square mb-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center overflow-hidden">
-        {costume.assets[0] ? (
-          <img 
-            src={costume.assets[0].url} 
-            alt={costume.assets[0].description}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback to placeholder if image fails to load
-              e.currentTarget.src = '/assets/costumes/placeholder.jpg';
-            }}
-          />
-        ) : (
-          <div className="text-4xl">👻</div>
-        )}
-      </div>
+  const CostumeCard = ({ costume }: { costume: CostumePreset }) => {
+    const thumbnail =
+      costume.assets.find(asset => asset.type === 'example') ||
+      costume.assets.find(asset => asset.type === 'main') ||
+      costume.assets[0]
+
+    return (
+      <Card 
+        className={`p-4 cursor-pointer transition-all duration-200 hover:scale-105 ${
+          activeCostume === costume.id 
+            ? 'ring-2 ring-primary ring-offset-2 bg-primary/5' 
+            : 'hover:bg-accent'
+        }`}
+        onClick={() => handleCostumeSelect(costume)}
+      >
+        <div className="aspect-square mb-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center overflow-hidden">
+          {thumbnail ? (
+            <img 
+              src={thumbnail.url} 
+              alt={thumbnail.description}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to placeholder if image fails to load
+                e.currentTarget.src = '/assets/costumes/placeholder.jpg';
+              }}
+            />
+          ) : (
+            <div className="text-4xl">👻</div>
+          )}
+        </div>
       
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -142,8 +148,9 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
           </div>
         </div>
       </div>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-6">

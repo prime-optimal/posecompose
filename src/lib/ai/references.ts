@@ -52,6 +52,7 @@ export const buildNanoGptReferences = ({
 	selfieMimeType,
 }: BuildNanoGptReferencesOptions): NanoGptReference[] => {
 	const limit = MODEL_REFERENCE_LIMITS[model]
+ const isSelfieOnly = import.meta.env.VITE_DEBUG_SELFIE_ONLY === 'true'
 
 	if (model === 'background-remover') {
 		const references: NanoGptReference[] = []
@@ -88,6 +89,10 @@ export const buildNanoGptReferences = ({
 			weight: 1.5,
 			mimeType: selfieMimeType ?? 'image/jpeg',
 		})
+	}
+
+	if (isSelfieOnly) {
+		return references.slice(0, limit)
 	}
 
 	if (references.length >= limit) {
