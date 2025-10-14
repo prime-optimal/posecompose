@@ -1,4 +1,4 @@
-import { Context } from '@netlify/functions'
+import type { Context } from '@netlify/functions'
 
 export default (request: Request, context: Context) => {
   try {
@@ -7,7 +7,9 @@ export default (request: Request, context: Context) => {
 
     return new Response(`Hello ${subject}`)
   } catch (error) {
-    return new Response(error.toString(), {
+    const message = error instanceof Error ? error.message : String(error)
+
+    return new Response(message, {
       status: 500,
     })
   }
