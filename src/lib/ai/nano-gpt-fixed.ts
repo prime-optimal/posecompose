@@ -8,6 +8,8 @@ export const MODEL_REFERENCE_LIMITS: Record<NanoGptModel, number> = {
 	'background-remover': 1,
 }
 
+const V1_ENDPOINT = 'https://nano-gpt.com/v1/images/generations'
+
 export type NanoGptReferenceKind = 'url' | 'base64'
 
 export interface NanoGptReference {
@@ -24,6 +26,9 @@ export interface NanoGptGenerationRequest {
 	prompt: string
 	references: NanoGptReference[]
 	negativePrompt?: string
+	numOutputs?: number
+	width?: number
+	height?: number
 	options?: Record<string, unknown>
 }
 
@@ -47,20 +52,6 @@ interface NanoGptProviderOptions {
 	apiKey?: string
 	baseUrl?: string
 	fetchImpl?: typeof fetch
-}
-
-const DEFAULT_ENDPOINT = 'https://nano-gpt.com/v1/images/generations'
-const MAX_ATTEMPTS = 3
-
-const normalizeEndpoint = (baseUrl?: string) => {
-	if (!baseUrl) {
-		return DEFAULT_ENDPOINT
-	}
-
-	const trimmed = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
-	return trimmed.includes('/v1/images/generations')
-		? trimmed
-		: `${trimmed}/v1/images/generations`
 }
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -114,7 +105,9 @@ const normalizeImages = (payload: unknown): NanoGptGeneratedImage[] => {
 				base64,
 			}
 		})
-		.filter((image): image is NanoGptGeneratedImage => Boolean(image))
+		.filter((image): image is NanoGptGeneratedImage =>
+			image !== null && (image.url !== undefined || image.base64 !== undefined)
+		)
 }
 
 const normalizeResponse = (data: unknown): NanoGptGenerationResponse => {
@@ -146,15 +139,12 @@ const normalizeResponse = (data: unknown): NanoGptGenerationResponse => {
 	}
 }
 
-export class NanoGptProvider {
+export class NanoGptProviderFixed {
 	private readonly apiKey?: string
-	private readonly endpoint: string
 	private readonly fetchImpl: typeof fetch
 
 	constructor(options: NanoGptProviderOptions = {}) {
 		this.apiKey = options.apiKey ?? import.meta.env.VITE_NANO_GPT_API_KEY
-		const configuredBase = options.baseUrl ?? import.meta.env.VITE_NANO_GPT_BASE_URL
-		this.endpoint = normalizeEndpoint(configuredBase)
 		this.fetchImpl = options.fetchImpl ?? fetch.bind(globalThis)
 	}
 
@@ -167,6 +157,7 @@ export class NanoGptProvider {
 			throw new Error('Nano GPT provider is not configured')
 		}
 
+		const endpoint = V1_ENDPOINT
 		const requestBody = this.buildPayload(request)
 		const referenceCount = Array.isArray(request.references)
 			? Math.min(request.references.length, MODEL_REFERENCE_LIMITS[request.model])
@@ -175,29 +166,28 @@ export class NanoGptProvider {
 
 		logEvent('nano_gpt_payload_ready', {
 			model: request.model,
+			endpoint,
 			referenceCount,
-			imageDataUrlBytes: typeof requestBody.imageDataUrl === 'string'
-				? requestBody.imageDataUrl.length
-				: null,
-			additionalReferenceCount: Array.isArray(requestBody.imageDataUrls)
-				? requestBody.imageDataUrls.length
-				: 0,
+			payloadSize: JSON.stringify(requestBody).length,
 		})
 
-		for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+		for (let attempt = 1; attempt <= 3; attempt += 1) {
 			try {
 				logEvent('nano_gpt_generation_started', {
 					model: request.model,
 					references: referenceCount,
 					attempt,
+					endpoint,
 				})
 
-				const response = await this.fetchImpl(this.endpoint, {
+				const headers: Record<string, string> = {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.apiKey}`,
+				}
+
+				const response = await this.fetchImpl(endpoint, {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${this.apiKey}`,
-					},
+					headers,
 					body: JSON.stringify(requestBody),
 				})
 
@@ -222,6 +212,7 @@ export class NanoGptProvider {
 					model: request.model,
 					referenceCount,
 					attempt,
+					imageCount: normalized.images.length,
 				})
 
 				return normalized
@@ -230,9 +221,10 @@ export class NanoGptProvider {
 				logError('nano_gpt_generation_error', error, {
 					attempt,
 					model: request.model,
+					endpoint,
 				})
 
-				if (attempt < MAX_ATTEMPTS) {
+				if (attempt < 3) {
 					await sleep(300 * attempt)
 				}
 			}
@@ -266,10 +258,11 @@ export class NanoGptProvider {
 			return `data:${mime};base64,${reference.value}`
 		}
 
+		// V1 endpoint structure (OpenAI compatible)
 		const payload: Record<string, unknown> = {
 			model: request.model,
 			prompt: request.prompt,
-			n: request.options?.numOutputs || 1,  // CRITICAL: Added required n parameter
+			n: request.numOutputs || 1,
 		}
 
 		// Only add size for models that support it
@@ -280,10 +273,8 @@ export class NanoGptProvider {
 			payload.size = '1024x1024'
 		}
 
-		// CRITICAL: Primary reference (user selfie) gets priority
 		payload.imageDataUrl = serializeReference(primary)
 
-		// Secondary references (costumes) go into array
 		if (secondary.length) {
 			payload.imageDataUrls = secondary.map(serializeReference)
 		}
@@ -294,9 +285,7 @@ export class NanoGptProvider {
 
 		if (request.options) {
 			Object.entries(request.options).forEach(([key, value]) => {
-				if (key !== 'numOutputs') { // Skip numOutputs as we handle it above
-					payload[key] = value
-				}
+				payload[key] = value
 			})
 		}
 

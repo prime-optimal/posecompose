@@ -1,0 +1,39 @@
+
+Prompt ID: daisy-racing-suit-detailed-v1
+Model: seedream-v4
+Seed: 1001
+Timestamp: 2025-10-15T00-33-22-118Z
+Costume: daisy-bodysuit
+
+=== PROMPT TEXT ===
+The user uploaded a personal photo (image 1).
+Apply the selected costume(s) from the following reference image to create a realistic virtual try-on result.
+
+Context:
+A highly detailed full-body rendering of Princess Daisys
+racing suit costume from Super Mario Kart.
+Focus on the outfits design and materials.
+The costume is a sleek, form-fitting bodysuit made of glossy yellow
+and bright orange late with reflective, vinyl-like texture.
+Orange panels run down the arms and sides, complemented by white stripe accents at the wrists.
+A gold belt with a square buckle cinches the waist.
+The chest area has a small green gemstone brooch resembling a daisy flower emblem.
+Include long orange gloves that match the suit, and a small,
+detailed golden crown adorned with red and green jewels positioned above her head.
+The lighting should highlight the costumes shimmer and contours, evoking the clean,
+vibrant aesthetic of Nintendo character design.
+Neutral background, studio lighting.
+The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.
+Keep the users hairstyle, facial expression and skin tone.
+
+=== REFERENCES ===
+- selfie: base64 (user)
+- costume-1: url (costume)
+- costume-2: url (costume)
+
+=== GENERATION SETTINGS ===
+- Model: seedream-v4
+- Seed: 1001
+- numOutputs: 1
+- resolution: auto
+- steps: 30

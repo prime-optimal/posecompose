@@ -1,0 +1,38 @@
+
+      Prompt ID: rosalina
+      Model: seedream-v4
+      Seed: 1004
+      Timestamp: 2025-10-15T01-26-49-693Z
+      Costume: rosalina
+
+      === PROMPT TEXT ===
+      The user uploaded a personal photo (image 1).
+          Apply the selected costume from the following reference image to create a realistic virtual try-on result.
+
+          Context:
+          A realistic, true to life Rosalina from Super Mario Kart. 
+          She wears a magnificent, celestial-inspired gown in a palette of pale sky blue and pristine white.
+          The costume consists of a form-fitting, pale blue off-the-shoulder bustier that reveals 
+          her midriff, crafted from a lustrous satin-like material that catches the light. 
+          Sexy, and yet classy at the same time.
+          On her head, she wears an ornate, polished silver crown shaped like a sparkling
+          star and a delicate crescent moon, with a large, brilliant sapphire-blue gem at its center. 
+          A simple silver necklace with a matching gem rests on her collarbone. 
+          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.
+          Keep the users hairstyle, facial expression and skin tone.
+          The background is a smooth, dreamy gradient of light blue, emphasizing the costume's delicate beauty.
+          
+          Style: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.
+
+      === REFERENCES ===
+      - selfie: base64 (user)
+- costume-1: url (costume)
+- costume-2: url (costume)
+
+      === GENERATION SETTINGS ===
+      - Model: seedream-v4
+      - Seed: 1004
+      - numOutputs: 1
+      - resolution: auto
+      - steps: 30
+      

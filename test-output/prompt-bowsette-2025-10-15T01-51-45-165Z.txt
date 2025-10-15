@@ -1,0 +1,43 @@
+
+      Prompt ID: bowsette
+      Model: seedream-v4
+      Seed: 1003
+      Timestamp: 2025-10-15T01-51-45-165Z
+      Costume: bowsette
+
+      === PROMPT TEXT ===
+      The user uploaded a personal photo (image 1).
+          Apply the selected costume from the following reference image to create a realistic virtual try-on result.
+          Keep the user's facial expression, and skin tone.
+
+          Context: 
+          Behold Bowsette, the naughtiest of the Koopa tribe and Bowser's dangerously hot cousin. 
+          Her costume is a provocative, form-fitting black leather corset, 
+          tightly laced to accentuate her curves, paired with a flirty pleated miniskirt. 
+          She wears sheer black stockings, a spiked choker, and a menacing horned crown and long blonde hair. 
+          Her powerful stance and smoldering gaze exude dominance and playful rebellion, 
+          making her the ultimate bad girl of the Mushroom Kingdom.
+
+          Photorealistic, dramatic lighting.
+
+          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.
+
+          Background: the moat of a castle with lava in the background.
+          Avoid: No sunglasses, no frowns, no words on clothing.
+          Style: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.
+
+      === REFERENCES ===
+      - selfie: base64 (user)
+- costume-1: url (costume)
+- costume-2: url (costume)
+- costume-3: url (costume)
+- costume-4: url (costume)
+- costume-5: url (costume)
+
+      === GENERATION SETTINGS ===
+      - Model: seedream-v4
+      - Seed: 1003
+      - numOutputs: 1
+      - resolution: auto
+      - steps: 30
+      

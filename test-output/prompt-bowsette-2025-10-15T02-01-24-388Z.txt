@@ -1,0 +1,57 @@
+
+      Prompt ID: bowsette
+      Model: seedream-v4
+      Seed: 1003
+      Timestamp: 2025-10-15T02-01-24-388Z
+      Costume: bowsette
+
+      === PROMPT TEXT ===
+      The user uploaded a personal photo (image 1).
+          Apply the selected costume from the following reference image to create a realistic virtual try-on result.
+          Keep the user's facial expression, and skin tone.
+
+          Context: 
+          Behold Bowsette, the naughtiest of the Koopa tribe and Bowser's dangerously hot cousin. 
+          Her costume is a dramatic and provocative, two-piece ensemble that blends gothic 
+          elegance with a rebellious, dominant edge.
+          
+          The Bodice: The top is a structured, form-fitting black corset, crafted from a leather-like material, 
+          giving it fetish-vibes and a powerful aesthetic.
+
+          The Skirt: The bottom is a high-waisted, short skirt composed of multiple layers of black fabric. 
+          These layers are gathered and pleated, creating a voluminous, ruffled silhouette that contrasts 
+          sharply with the tight bodice. 
+          
+          The skirt is notably short, ending high on the thighs, and its fullness adds a playful, 
+          theatrical element to the otherwise severe top.
+
+          She wears sheer black stockings, a spiked choker, and a menacing horned crown and long blonde hair. 
+          Her powerful stance and smoldering gaze exude dominance and playful rebellion, 
+          making her the ultimate bad girl of the Mushroom Kingdom.
+
+          Photorealistic, dramatic lighting.  Spotlights shining on her from both sides.
+
+          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.
+
+          Background: the moat of a castle with lava in the background.  Slightly muted contrast to emphasize 
+          the detail on the corset.  
+          Avoid: No sunglasses, no frowns, no words on clothing.
+          Style: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.
+
+      === REFERENCES ===
+      - selfie: base64 (user)
+- costume-1: url (costume)
+- costume-2: url (costume)
+- costume-3: url (costume)
+- costume-4: url (costume)
+- costume-5: url (costume)
+- costume-6: url (costume)
+- costume-7: url (costume)
+
+      === GENERATION SETTINGS ===
+      - Model: seedream-v4
+      - Seed: 1003
+      - numOutputs: 1
+      - resolution: auto
+      - steps: 30
+      

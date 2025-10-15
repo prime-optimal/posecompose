@@ -8,7 +8,7 @@ export const MODEL_REFERENCE_LIMITS: Record<NanoGptModel, number> = {
 	'background-remover': 1,
 }
 
-export type NanoGptReferenceKind = 'url' | 'base64'
+export type NanoGptReferenceKind = 'url' | 'base64' | 'file'
 
 export interface NanoGptReference {
 	id: string
@@ -24,6 +24,7 @@ export interface NanoGptGenerationRequest {
 	prompt: string
 	references: NanoGptReference[]
 	negativePrompt?: string
+	numOutputs?: number
 	options?: Record<string, unknown>
 }
 
@@ -45,25 +46,61 @@ export interface NanoGptGenerationResponse {
 
 interface NanoGptProviderOptions {
 	apiKey?: string
-	baseUrl?: string
 	fetchImpl?: typeof fetch
 }
 
-const DEFAULT_ENDPOINT = 'https://nano-gpt.com/v1/images/generations'
+const V1_ENDPOINT = 'https://nano-gpt.com/v1/images/generations'
 const MAX_ATTEMPTS = 3
 
-const normalizeEndpoint = (baseUrl?: string) => {
-	if (!baseUrl) {
-		return DEFAULT_ENDPOINT
-	}
-
-	const trimmed = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
-	return trimmed.includes('/v1/images/generations')
-		? trimmed
-		: `${trimmed}/v1/images/generations`
-}
-
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+const fetchAndConvertToBase64 = async (source: string, mimeType: string = 'image/jpeg'): Promise<string> => {
+	try {
+		// Check if it's a URL or a local file path
+		if (source.startsWith('http://') || source.startsWith('https://')) {
+			// Handle URLs
+			const response = await fetch(source)
+			if (!response.ok) {
+				throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`)
+			}
+			const arrayBuffer = await response.arrayBuffer()
+			const base64 = Buffer.from(arrayBuffer).toString('base64')
+			return `data:${mimeType};base64,${base64}`
+		} else {
+			// Handle local file paths
+			const fs = await import('fs')
+			const path = await import('path')
+			
+			// Resolve relative paths
+			const absolutePath = path.resolve(source)
+			
+			// Check if file exists
+			if (!fs.existsSync(absolutePath)) {
+				throw new Error(`File not found: ${absolutePath}`)
+			}
+			
+			// Read file and convert to base64
+			const imageBuffer = fs.readFileSync(absolutePath)
+			const base64 = imageBuffer.toString('base64')
+			
+			// Try to detect mime type from extension
+			const ext = path.extname(absolutePath).toLowerCase()
+			let detectedMimeType = mimeType
+			if (ext === '.png') {
+				detectedMimeType = 'image/png'
+			} else if (ext === '.webp') {
+				detectedMimeType = 'image/webp'
+			} else if (ext === '.jpg' || ext === '.jpeg') {
+				detectedMimeType = 'image/jpeg'
+			}
+			
+			return `data:${detectedMimeType};base64,${base64}`
+		}
+	} catch (error) {
+		console.error('Error converting image to base64:', error)
+		throw error
+	}
+}
 
 const safeParseJson = async (response: Response) => {
 	try {
@@ -110,11 +147,13 @@ const normalizeImages = (payload: unknown): NanoGptGeneratedImage[] => {
 
 			return {
 				id,
-				url,
-				base64,
+				url: url || undefined,
+				base64: base64 || undefined,
 			}
 		})
-		.filter((image): image is NanoGptGeneratedImage => Boolean(image))
+		.filter((image): image is NanoGptGeneratedImage => {
+			return image !== null
+		})
 }
 
 const normalizeResponse = (data: unknown): NanoGptGenerationResponse => {
@@ -146,15 +185,12 @@ const normalizeResponse = (data: unknown): NanoGptGenerationResponse => {
 	}
 }
 
-export class NanoGptProvider {
+export class NanoGptProviderV2 {
 	private readonly apiKey?: string
-	private readonly endpoint: string
 	private readonly fetchImpl: typeof fetch
 
 	constructor(options: NanoGptProviderOptions = {}) {
 		this.apiKey = options.apiKey ?? import.meta.env.VITE_NANO_GPT_API_KEY
-		const configuredBase = options.baseUrl ?? import.meta.env.VITE_NANO_GPT_BASE_URL
-		this.endpoint = normalizeEndpoint(configuredBase)
 		this.fetchImpl = options.fetchImpl ?? fetch.bind(globalThis)
 	}
 
@@ -167,7 +203,7 @@ export class NanoGptProvider {
 			throw new Error('Nano GPT provider is not configured')
 		}
 
-		const requestBody = this.buildPayload(request)
+		const requestBody = await this.buildPayload(request)
 		const referenceCount = Array.isArray(request.references)
 			? Math.min(request.references.length, MODEL_REFERENCE_LIMITS[request.model])
 			: 0
@@ -175,13 +211,9 @@ export class NanoGptProvider {
 
 		logEvent('nano_gpt_payload_ready', {
 			model: request.model,
+			endpoint: V1_ENDPOINT,
 			referenceCount,
-			imageDataUrlBytes: typeof requestBody.imageDataUrl === 'string'
-				? requestBody.imageDataUrl.length
-				: null,
-			additionalReferenceCount: Array.isArray(requestBody.imageDataUrls)
-				? requestBody.imageDataUrls.length
-				: 0,
+			payloadSize: JSON.stringify(requestBody).length,
 		})
 
 		for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
@@ -192,11 +224,11 @@ export class NanoGptProvider {
 					attempt,
 				})
 
-				const response = await this.fetchImpl(this.endpoint, {
+				const response = await this.fetchImpl(V1_ENDPOINT, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${this.apiKey}`,
+						'Authorization': `Bearer ${this.apiKey}`,
 					},
 					body: JSON.stringify(requestBody),
 				})
@@ -222,6 +254,7 @@ export class NanoGptProvider {
 					model: request.model,
 					referenceCount,
 					attempt,
+					imageCount: normalized.images.length,
 				})
 
 				return normalized
@@ -241,7 +274,7 @@ export class NanoGptProvider {
 		throw lastError instanceof Error ? lastError : new Error('Unknown Nano GPT error')
 	}
 
-	private buildPayload(request: NanoGptGenerationRequest) {
+	private async buildPayload(request: NanoGptGenerationRequest) {
 		const limit = MODEL_REFERENCE_LIMITS[request.model]
 		const references = request.references.slice(0, limit)
 
@@ -253,7 +286,7 @@ export class NanoGptProvider {
 			references.find(reference => reference.role === 'user') ?? references[0]
 		const secondary = references.filter(reference => reference !== primary)
 
-		const serializeReference = (reference: NanoGptReference) => {
+		const serializeReference = async (reference: NanoGptReference) => {
 			if (reference.kind === 'url') {
 				return reference.value
 			}
@@ -262,14 +295,20 @@ export class NanoGptProvider {
 				return reference.value
 			}
 
+			if (reference.kind === 'file') {
+				// Convert file to base64
+				return await fetchAndConvertToBase64(reference.value, reference.mimeType || 'image/jpeg')
+			}
+
 			const mime = reference.mimeType || 'image/jpeg'
 			return `data:${mime};base64,${reference.value}`
 		}
 
+		// V1 endpoint structure (OpenAI compatible)
 		const payload: Record<string, unknown> = {
 			model: request.model,
 			prompt: request.prompt,
-			n: request.options?.numOutputs || 1,  // CRITICAL: Added required n parameter
+			n: request.numOutputs || 1,
 		}
 
 		// Only add size for models that support it
@@ -280,23 +319,33 @@ export class NanoGptProvider {
 			payload.size = '1024x1024'
 		}
 
-		// CRITICAL: Primary reference (user selfie) gets priority
-		payload.imageDataUrl = serializeReference(primary)
-
-		// Secondary references (costumes) go into array
-		if (secondary.length) {
-			payload.imageDataUrls = secondary.map(serializeReference)
+		// For multiple images, use only imageDataUrls array (as per Python example)
+		if (references.length > 1) {
+			const allImageDataUrls = await Promise.all(references.map(serializeReference))
+			payload.imageDataUrls = allImageDataUrls
+		} else {
+			// For single image, use imageDataUrl
+			if (primary.kind === 'url' || primary.kind === 'file') {
+				try {
+					payload.imageDataUrl = await fetchAndConvertToBase64(primary.value, primary.mimeType || 'image/jpeg')
+				} catch (error) {
+					console.error('Failed to convert primary image to base64, falling back to original value:', error)
+					payload.imageDataUrl = await serializeReference(primary)
+				}
+			} else {
+				payload.imageDataUrl = await serializeReference(primary)
+			}
 		}
 
+		// Add optional negative prompt
 		if (request.negativePrompt) {
 			payload.negative_prompt = request.negativePrompt
 		}
 
+		// Add any additional options
 		if (request.options) {
 			Object.entries(request.options).forEach(([key, value]) => {
-				if (key !== 'numOutputs') { // Skip numOutputs as we handle it above
-					payload[key] = value
-				}
+				payload[key] = value
 			})
 		}
 
