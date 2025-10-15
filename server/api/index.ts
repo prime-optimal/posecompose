@@ -62,10 +62,10 @@ const buildCorsHeaders = (origin: string) => {
 
 const withCors = (response: Response, origin: string) => {
 	const headers = buildCorsHeaders(origin)
-	const newResponse = new Response((response as any).body, {
-		status: (response as any).status,
-		statusText: (response as any).statusText,
-		headers: { ...(response as any).headers, ...headers }
+	const newResponse = new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers: { ...response.headers, ...headers }
 	})
 	return newResponse
 }
@@ -142,7 +142,7 @@ const emitLog = (entry: IngestedLogEntry) => {
 const handleLogIngest = async (request: Request, origin: string) => {
 	let payload: unknown
 	try {
-		payload = await (request as any).json()
+		payload = await request.json()
 	} catch (error) {
 		return jsonResponse({ error: 'Invalid JSON payload' }, 400, origin)
 	}
@@ -174,7 +174,7 @@ const API_PORT = process.env.PORT ? Number(process.env.PORT) : 4000
 
 // Shared request handler that works in both Node (Vercel) and Bun
 async function handler(request: Request): Promise<Response> {
-	const { method } = request as any
+	const { method } = request
 	
 	// use absolute URL when running locally; use resolved base otherwise
 	const url = new URL(
@@ -185,9 +185,9 @@ async function handler(request: Request): Promise<Response> {
 	)
 	
 	const requestOrigin =
-		typeof (request as any).headers?.get === 'function'
-			? (request as any).headers.get('origin')
-			: (request as any).headers?.origin ?? (request as any).headers?.Origin ?? null
+		typeof request.headers?.get === 'function'
+			? request.headers.get('origin')
+			: (request.headers as unknown as Record<string, string>)?.origin ?? (request.headers as unknown as Record<string, string>)?.Origin ?? null
   const allowedOrigin = resolveAllowedOrigin(requestOrigin)
 
   // CORS preflight
@@ -216,9 +216,9 @@ async function handler(request: Request): Promise<Response> {
 }
 
 // ----- Conditional local server using Bun -----
-if (typeof (globalThis as any).Bun !== 'undefined' && !process.env.VERCEL) {
+if (typeof (globalThis as typeof globalThis & { Bun?: { serve: (options: { port: number; fetch: (request: Request) => Promise<Response> }) => { url: { origin: string } } } }).Bun !== 'undefined' && !process.env.VERCEL) {
   console.log(`🌀  Running local Bun server on http://localhost:${API_PORT}`)
-  const server = (globalThis as any).Bun.serve({ port: API_PORT, fetch: handler })
+  const server = (globalThis as typeof globalThis & { Bun: { serve: (options: { port: number; fetch: (request: Request) => Promise<Response> }) => { url: { origin: string } } } }).Bun.serve({ port: API_PORT, fetch: handler })
   console.log(`Neon costume API is listening on ${server.url.origin}`)
 }
 

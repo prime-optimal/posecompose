@@ -7,14 +7,14 @@ const GLOBAL_HANDLER_KEY = '__posecomposeApiHandler'
 const handlerImplementation = async (request: Request) =>
 	new Response(`handled:${new URL(request.url).pathname}`, { status: 200 })
 
-const handlerMock: any = mock(handlerImplementation)
+const handlerMock = mock(handlerImplementation)
 
 const applyHandlerImplementation = () => {
-	(handlerMock as any).mockImplementation?.(handlerImplementation)
+	handlerMock.mockImplementation?.(handlerImplementation)
 }
 
 const setHandlerOverride = () => {
-	;(handlerMock as any).mockReset?.()
+	handlerMock.mockReset?.()
 	applyHandlerImplementation()
 	;(globalThis as Record<string, unknown>)[GLOBAL_HANDLER_KEY] = handlerMock
 }
@@ -43,8 +43,8 @@ const moduleLoaders: Array<{ label: string; loader: () => Promise<ApiModule> }> 
 
 for (const { label, loader } of moduleLoaders) {
 	describe(`${label} handler`, () => {
-		let apiModule: any
-
+		let apiModule: ApiModule
+	
 		beforeAll(async () => {
 			apiModule = await loader()
 		})

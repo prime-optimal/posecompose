@@ -69,3 +69,5 @@ assets/costumes/
 
 # Netlify functions
 # netlify/
+test-input/
+test-output/
