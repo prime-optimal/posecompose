@@ -27,6 +27,25 @@ export const CostumeSelection = ({ onCostumeSelect, onBack, selectedCostume }: C
     const loadCostumes = async () => {
       try {
         setLoadingCostumes(true);
+
+        // Try static JSON first (build-time data from Neon)
+        try {
+          const staticResponse = await fetch('/costumes.json');
+          if (staticResponse.ok) {
+            const staticCostumes = await staticResponse.json();
+            if (staticCostumes && staticCostumes.length > 0) {
+              if (!isMounted) return;
+              setCostumes(staticCostumes);
+              setLoadError(null);
+              console.log(`Loaded ${staticCostumes.length} costumes from build-time data`);
+              return;
+            }
+          }
+        } catch (staticError) {
+          console.log('Static costumes not available, falling back to API:', staticError);
+        }
+
+        // Fallback to API
         const apiCostumes = await fetchCostumes();
         if (!isMounted) return;
         setCostumes(apiCostumes);
