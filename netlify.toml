@@ -8,8 +8,11 @@
     to = "/.netlify/functions/api/:splat"
     status = 200
 
-# Handle Netlify function direct access
-[[redirects]]
-    from = "/.netlify/functions/api"
-    to = "/.netlify/functions/api/"
-    status = 200
+
+# Build configuration
+[build]
+    command = "bun run build"
+    publish = "dist"
+
+[build.environment]
+    NODE_VERSION = "18"
