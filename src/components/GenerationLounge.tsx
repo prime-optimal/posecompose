@@ -15,11 +15,13 @@ import {
 	Loader2,
 } from 'lucide-react'
 import { CostumePreset } from '@/types/costume'
+import { CostumePresetV2 } from '@/types/costume-v2'
 import { logEvent, logError } from '@/lib/logger'
-import { NanoGptProvider, type NanoGptModel, buildNanoGptReferences } from '@/lib/ai'
+import { NanoGptProviderV2, type NanoGptModel } from '@/lib/ai'
+import { AIGenerationService } from '@/lib/ai/ai-generation-service'
 
 interface GenerationLoungeProps {
-  selectedCostume: CostumePreset
+  selectedCostume: CostumePreset | CostumePresetV2
   userEmail?: string
   selfieBase64?: string | null
   uploadedSelfie?: File | null
@@ -43,21 +45,6 @@ const getDefaultNanoGptModel = (): NanoGptModel => {
 	return 'seedream-v4'
 }
 
-const buildPromptFromCostume = (costume: CostumePreset) => {
-	const { transformation } = costume
-	const primaryParts = [transformation.base]
-	const variation = transformation.variations?.[0]?.prompt
-	if (variation) {
-		primaryParts.push(variation)
-	}
-	if (transformation.qualityModifiers?.length) {
-		primaryParts.push(transformation.qualityModifiers.join(', '))
-	}
-	if (transformation.detailEnhancements?.length) {
-		primaryParts.push(`detail: ${transformation.detailEnhancements.join(', ')}`)
-	}
-	return primaryParts.filter(Boolean).join('. ')
-}
 
 type GenerationStatus = 'idle' | 'running' | 'error' | 'success' | 'config-missing'
 
@@ -68,7 +55,7 @@ export const GenerationLounge = ({
 	uploadedSelfie,
 	onComplete,
 }: GenerationLoungeProps) => {
-	const provider = useMemo(() => new NanoGptProvider(), [])
+	const provider = useMemo(() => new NanoGptProviderV2(), [])
 	const [status, setStatus] = useState<GenerationStatus>('idle')
 	const [attempt, setAttempt] = useState(0)
 	const [currentStage, setCurrentStage] = useState(0)
@@ -180,60 +167,72 @@ export const GenerationLounge = ({
 			setErrorMessage(null)
 			setProgress(10)
 
-			try {
-		const references = buildNanoGptReferences({
-			costume: selectedCostume,
-			model,
-			selfieBase64,
-			selfieMimeType: uploadedSelfie?.type ?? null,
-			includeFallback: model === 'background-remover' && !selfieBase64,
-	})
-
-				if (!references.length) {
-					throw new Error('No reference assets available for Nano GPT request')
+			// Convert to V2 format if needed
+			const costumeV2: CostumePresetV2 = 'aiGeneration' in selectedCostume
+				? selectedCostume as CostumePresetV2
+				: {
+					...selectedCostume,
+					aiGeneration: {
+						model: 'seedream-v4',
+						seed: 42,
+						primaryPrompt: selectedCostume.transformation.base,
+						fallbackPrompt: selectedCostume.transformation.base,
+						negativePrompt: selectedCostume.transformation.negativePrompts?.join(', '),
+						steps: 20,
+						resolution: '1024x1024',
+						showExplicitContent: false,
+						numOutputs: 1,
+						referenceStrategy: 'priority-order',
+						maxReferences: 4,
+						primaryReferenceIds: [],
+						qualityModifiers: selectedCostume.transformation.qualityModifiers || [],
+						styleEnhancements: selectedCostume.transformation.detailEnhancements || [],
+						modelOptions: {}
+					}
 				}
 
-				const prompt = buildPromptFromCostume(selectedCostume)
-				const negativePrompt = selectedCostume.transformation.negativePrompts?.join(', ')
+			const aiRequest = AIGenerationService.buildRequest({
+				costume: costumeV2,
+				selfieBase64,
+				selfieMimeType: uploadedSelfie?.type ?? null,
+				model: getDefaultNanoGptModel(),
+				includeFallback: true,
+			})
+
+			try {
 
 	logEvent('generation_prompt_composed', {
 		costumeId: selectedCostume.id,
 		costumeName: selectedCostume.name,
-		model,
-		prompt,
-		negativePrompt,
-				includesUserSelfie: references.some(reference => reference.role === 'user'),
-				userSelfieKind: references.find(reference => reference.role === 'user')?.kind ?? null,
-				userSelfieBytes:
-					references
-						.find(reference => reference.role === 'user' && reference.kind === 'base64')?.value
-						?.length ?? null,
-				costumeReferenceCount: references.filter(reference => reference.role === 'costume').length,
-				referenceSummary: references.map(reference => ({
-					id: reference.id,
-					role: reference.role,
-					kind: reference.kind,
-					hasInlineData: reference.kind === 'base64',
-					inlineLength: reference.kind === 'base64' ? reference.value.length : null,
-					mimeType: reference.mimeType ?? null,
-					value: reference.kind === 'url' ? reference.value : undefined,
-					weight: reference.weight ?? null,
-				})),
+		model: aiRequest.model,
+		prompt: aiRequest.prompt,
+		negativePrompt: aiRequest.negativePrompt,
+		includesUserSelfie: aiRequest.references.some(reference => reference.role === 'user'),
+		userSelfieKind: aiRequest.references.find(reference => reference.role === 'user')?.kind ?? null,
+		userSelfieBytes:
+			aiRequest.references
+				.find(reference => reference.role === 'user' && reference.kind === 'base64')?.value
+				?.length ?? null,
+		costumeReferenceCount: aiRequest.references.filter(reference => reference.role === 'costume').length,
+		referenceSummary: aiRequest.references.map(reference => ({
+			id: reference.id,
+			role: reference.role,
+			kind: reference.kind,
+			hasInlineData: reference.kind === 'base64',
+			inlineLength: reference.kind === 'base64' ? reference.value.length : null,
+			mimeType: reference.mimeType ?? null,
+			value: reference.kind === 'url' ? reference.value : undefined,
+		})),
 	})
 
 				logEvent('generation_request_dispatched', {
 					costumeId: selectedCostume.id,
-					model,
-					references: references.length,
+					model: aiRequest.model,
+					references: aiRequest.references.length,
 					attempt,
 				})
 
-			const response = await provider.generateImage({
-				model,
-				prompt,
-				references,
-				negativePrompt,
-			})
+			const response = await provider.generateImage(aiRequest)
 
 				if (isCancelled) {
 					return
@@ -259,8 +258,8 @@ export const GenerationLounge = ({
 				logEvent('generation_completed', {
 					costumeId: selectedCostume.id,
 					costumeName: selectedCostume.name,
-					model,
-					referenceCount: references.length,
+					model: aiRequest.model,
+					referenceCount: aiRequest.references.length,
 					attempt,
 				})
 
@@ -279,7 +278,7 @@ export const GenerationLounge = ({
 				setErrorMessage(message)
 				logError('generation_failed', error, {
 					costumeId: selectedCostume.id,
-					model,
+					model: getDefaultNanoGptModel(),
 					attempt,
 					references: selfieBase64 ? 'selfie+catalog' : 'catalog-only',
 				})

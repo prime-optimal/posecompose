@@ -25,7 +25,19 @@ Rebrand the existing experience into Waifu Material and deliver a polished Hallo
    - Provide mockable interfaces for tests. ✅
    - Adopt Neon HTTP driver for API + seeding; local API runs with `bun run serve:api`. ✅
 
-5. **Instrumentation & Data Hooks**  _(affiliates-comms-droid + ai-pipeline-droid)_
+4.5 **AI Settings Persistence** _(ai-pipeline-droid)_ ✅ **COMPLETED**
+   - Added `ai_settings` JSONB column on `costumes` with migration.
+   - Script `bun run seed:ai` upserts tuned Bowsette/Daisy/Rosalina settings.
+   - API + frontend now surface optional `aiSettings` and merge during generation.
+
+6. **AI Generation Unification & Tuned Prompts** _(ai-pipeline-droid)_ ✅ **COMPLETED**
+   - Unified AI payload structures across different models (seedream-v4, google:4@1, background-remover).
+   - Implemented production-ready virtual try-on prompts with Halloween-specific optimizations.
+   - Enhanced database schema with separated prompt columns and dedicated reference tables.
+   - Established proper reference image ordering system with multiple strategies.
+   - Created comprehensive testing and debugging tools for AI generation.
+
+5. **Instrumentation & Data Hooks**  _(affiliates-comms-droid + ai-pipeline-droid)_ ✅ **COMPLETED**
    - Extend logging events (selection, email, generation, affiliate clicks, social shares).
    - Stub email submission endpoint integration.
    - Document how the default costume image is selected and how to change it.
@@ -34,7 +46,7 @@ Rebrand the existing experience into Waifu Material and deliver a polished Hallo
    - Document how to update each costume's prompt and included reference images.
    - Maintain instrumentation source of truth under `docs/instrumentation/` for future updates.
 
-6. **Documentation & Ops**  _(ops-docs-droid)_
+7. **Documentation & Ops**  _(ops-docs-droid)_
    - Keep README, AGENTS.md, CHANGELOG.md, docs/TODO.md synchronized.
    - Capture deployment notes for Vercel and optional Backblaze B2 CDN.
    - Maintain Mermaid diagrams (systems, timelines, complex flows) and ensure matching SVG/PNG exports live in `docs/diagrams/`.
@@ -45,7 +57,7 @@ Rebrand the existing experience into Waifu Material and deliver a polished Hallo
 - Reference both the inline Mermaid code and the exported assets within docs so readers without Mermaid support still see visuals.
 
 ### Exit Criteria
-- All sub-phases completed with passing lint/tests.
+- All sub-phases (1-6) completed with passing lint/tests.
 - Documentation updated to reflect feature set and processes.
 - Summary + challenge log recorded, changes committed, PR opened.
 

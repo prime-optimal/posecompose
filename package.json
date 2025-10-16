@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "seed:costumes": "bun run scripts/seed-neon-costumes.ts",
+    "seed:ai": "bun run scripts/seed-ai-settings.ts",
+    "migrate:local": "bun run scripts/apply-migration.ts",
     "serve:api": "bun --env-file=.env run server/api/index.ts",
     "dev:full": "concurrently \"bun run serve:api\" \"bun run dev\"",
     "dev:check": "node scripts/check-dev-setup.js",

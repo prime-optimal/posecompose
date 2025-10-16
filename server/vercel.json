@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "functions": {
-    "api/**/*.ts": { "runtime": "@godsreveal/vercel-bun@0.2.4" }
-  },
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.ts" }
-  ]
-}

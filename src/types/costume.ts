@@ -50,6 +50,8 @@ export interface CostumeAffiliateLink {
   description?: string;
 }
 
+import type { AiGenerationSettings } from './extracted-costume-settings'
+
 export interface CostumePreset {
   id: string;
   name: string;
@@ -88,6 +90,7 @@ export interface CostumePreset {
   // Additional data
   notes?: string;
   inspiration?: string;
+  aiSettings?: AiGenerationSettings;
 }
 
 export interface CostumeCategory {

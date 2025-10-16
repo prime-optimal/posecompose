@@ -1,0 +1,1199 @@
+{
+  "count": 8,
+  "items": [
+    {
+      "id": "rosalina",
+      "name": "Rosalina",
+      "category": "princess-rosalina",
+      "description": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "rosalina-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-square.png",
+          "type": "example",
+          "description": "Rosalina Square"
+        },
+        {
+          "id": "rosalina-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-profile.jpg",
+          "type": "main",
+          "description": "Rosalina Profile"
+        },
+        {
+          "id": "rosalina-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-strip.jpg",
+          "type": "detail",
+          "description": "Rosalina Strip"
+        },
+        {
+          "id": "rosalina-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-strip-back.jpg",
+          "type": "detail",
+          "description": "Rosalina Strip Back"
+        },
+        {
+          "id": "rosalina-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-layout.jpg",
+          "type": "detail",
+          "description": "Rosalina Layout"
+        }
+      ],
+      "colors": {
+        "accent": "#00C2A8",
+        "palette": [
+          "#6C5CE7",
+          "#FFB3C6",
+          "#00C2A8",
+          "#FFD166",
+          "#F25F5C"
+        ],
+        "primary": "#6C5CE7",
+        "secondary": "#FFB3C6"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1004,
+        "primaryPrompt": "The user uploaded a personal photo (image 1).\n          Apply the selected costume from the following reference image to create a realistic virtual try-on result.\n          Keep the users hairstyle, facial expression and skin tone.\n\n          Context:\n          A realistic, true to life Rosalina from Super Mario Kart. \n          A seductive reimagining of Rosalina, the classic gaming princess. \n          She wears a daring, form-fitting pale blue bustier that reveals \n          her midriff and a hint of cleavage. The voluminous skirt is slit high, \n          offering a playful glimpse of her legs. \n          Dramatic, wide sleeves with delicate white lace frame her alluring pose. \n          A sparkling silver, jeweled crown rests on her hair, completing this naughty \n          yet elegant tribute to the celestial princess. Photorealistic, soft lighting.\n\n          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\n          Background: She is at a classy, masquerade ball.  Lots of people are around, but out of focus and slightly in the shadows.\n          Avoid: No sunglasses, no frowns, no words on clothing.\n          Style: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
+        "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark, sunglasses, frowns, words on clothing",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": true,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [
+          "rosalina-blurred",
+          "rosalina-crown"
+        ],
+        "qualityModifiers": [
+          "photorealistic",
+          "sharp focus",
+          "8K",
+          "studio lighting",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "dramatic",
+          "cinematic",
+          "soft lighting",
+          "hyper-detailed"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. | Outfit swap inspired by Rosalina"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "medieval armor",
+          "casual clothing",
+          "extra limbs",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "princess-rosalina",
+          "mario-kart",
+          "nintendo",
+          "blue",
+          "rosalina"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 7,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Rosalina",
+        "callToAction": "Generate the Rosalina look",
+        "socialPreview": "Transform into Rosalina with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Rosalina"
+      },
+      "affiliateLinks": [
+        {
+          "id": "rosalina-affiliate",
+          "url": "https://amzn.to/4gZ4H9v",
+          "label": "Rosalina Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": false,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-16T12:29:42.656Z"
+    },
+    {
+      "id": "daisy-bodysuit",
+      "name": "Princess Daisy (Bodysuit)",
+      "category": "princess",
+      "description": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "daisy-bodysuit-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-wins.png",
+          "type": "example",
+          "description": "Daisy Wins"
+        },
+        {
+          "id": "daisy-bodysuit-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-back.jpg",
+          "type": "main",
+          "description": "Daisy Bodysuit Back"
+        },
+        {
+          "id": "daisy-bodysuit-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-crown.jpg",
+          "type": "detail",
+          "description": "Daisy Bodysuit Crown"
+        },
+        {
+          "id": "daisy-bodysuit-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-layout.jpg",
+          "type": "detail",
+          "description": "Daisy Bodysuit Layout"
+        },
+        {
+          "id": "daisy-bodysuit-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-buckle.jpg",
+          "type": "detail",
+          "description": "Daisy Bodysuit Buckle"
+        }
+      ],
+      "colors": {
+        "accent": "#F48FB1",
+        "palette": [
+          "#FF8A80",
+          "#81D4FA",
+          "#F48FB1",
+          "#A7FF83",
+          "#FFD54F"
+        ],
+        "primary": "#FF8A80",
+        "secondary": "#81D4FA"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1001,
+        "primaryPrompt": "The user uploaded a personal photo (image 1).\n          Apply the selected costume from the following reference image to create a realistic virtual try-on result.\n\n          Context:\n          A highly detailed full-body rendering of Princess Daisy's\n          racing suit costume from Super Mario Kart.\n          Focus on the outfits design and materials.\n          The costume is a sleek, form-fitting bodysuit made of glossy yellow\n          and bright orange late with reflective, vinyl-like texture.\n          Orange panels run down the arms and sides, complemented by white stripe accents at the wrists.\n          A gold belt with a square buckle cinches the waist.\n          The cut of the bodysuit shows off her bare thighs.\n          The chest area has a small green gemstone brooch resembling a daisy flower emblem.\n          Include long orange gloves that match the suit, and a small,\n          detailed golden crown adorned with red and green jewels positioned above her head.\n          The lighting should highlight the costumes shimmer and contours, evoking the clean,\n          vibrant aesthetic of Nintendo character design.\n          Neutral background, studio lighting.\n          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n          Keep the users hairstyle, facial expression and skin tone.",
+        "negativePrompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 3,
+        "primaryReferenceIds": [
+          "daisy-bodysuit-blurred"
+        ],
+        "qualityModifiers": [
+          "photorealistic",
+          "sharp focus",
+          "8K",
+          "studio lighting",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "dramatic",
+          "cinematic",
+          "soft lighting",
+          "hyper-detailed"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit. | Outfit swap inspired by Princess Daisy (Bodysuit)"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "distorted face",
+          "extra limbs",
+          "wrong costume",
+          "casual clothing",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "princess",
+          "daisy",
+          "super-mario",
+          "yellow"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 7,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Princess Daisy (Bodysuit)",
+        "callToAction": "Generate the Princess Daisy (Bodysuit) look",
+        "socialPreview": "Transform into Princess Daisy (Bodysuit) with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Princess Daisy (Bodysuit)"
+      },
+      "affiliateLinks": [
+        {
+          "id": "daisy-bodysuit-affiliate",
+          "url": "https://amzn.to/4pU7mp3",
+          "label": "Princess Daisy (Bodysuit) Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": true,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-16T12:29:42.597Z"
+    },
+    {
+      "id": "peach-skirt",
+      "name": "Princess Peach (Tennis Skirt)",
+      "category": "princess-peach",
+      "description": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "peach-skirt-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-square.png",
+          "type": "example",
+          "description": "Princess Peach Skirt Square"
+        },
+        {
+          "id": "peach-skirt-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-front.jpg",
+          "type": "main",
+          "description": "Princess Peach Skirt Front"
+        },
+        {
+          "id": "peach-skirt-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-skirt-back.jpg",
+          "type": "detail",
+          "description": "Princess Peach Skirt Back"
+        },
+        {
+          "id": "peach-skirt-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-profile.jpg",
+          "type": "detail",
+          "description": "Princess Peach Profile"
+        },
+        {
+          "id": "peach-skirt-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-side.jpg",
+          "type": "detail",
+          "description": "Princess Peach Side"
+        },
+        {
+          "id": "peach-skirt-asset-5",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/peach-skirt/princess-peach-accessories.jpg",
+          "type": "detail",
+          "description": "Princess Peach Accessories"
+        }
+      ],
+      "colors": {
+        "accent": "#80DEEA",
+        "palette": [
+          "#B388FF",
+          "#FFAB91",
+          "#80DEEA",
+          "#C5E1A5",
+          "#FFD180"
+        ],
+        "primary": "#B388FF",
+        "secondary": "#FFAB91"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1000,
+        "primaryPrompt": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "negativePrompt": "low quality, cartoonish, distorted anatomy, casual clothing, duplicate face, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. | Outfit swap inspired by Princess Peach (Tennis Skirt)"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Princess Peach costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "cartoonish",
+          "distorted anatomy",
+          "casual clothing",
+          "duplicate face",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "princess-peach",
+          "super-mario",
+          "nintendo",
+          "pink"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 8,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Princess Peach (Tennis Skirt)",
+        "callToAction": "Generate the Princess Peach (Tennis Skirt) look",
+        "socialPreview": "Transform into Princess Peach (Tennis Skirt) with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Princess Peach (Tennis Skirt)"
+      },
+      "affiliateLinks": [
+        {
+          "id": "peach-skirt-affiliate",
+          "url": "https://amzn.to/48Mbilu",
+          "label": "Princess Peach (Tennis Skirt) Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": true,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-15T05:24:41.317Z"
+    },
+    {
+      "id": "kitana",
+      "name": "Kitana",
+      "category": "kitana",
+      "description": "Outfit swap of the subject wearing the Kitana costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "kitana-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-square.png",
+          "type": "example",
+          "description": "Kitana Square"
+        },
+        {
+          "id": "kitana-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-profile.jpg",
+          "type": "main",
+          "description": "Kitana Profile"
+        },
+        {
+          "id": "kitana-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-closeup.jpg",
+          "type": "detail",
+          "description": "Kitana Closeup"
+        },
+        {
+          "id": "kitana-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-side-back.jpg",
+          "type": "detail",
+          "description": "Kitana Side Back"
+        },
+        {
+          "id": "kitana-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/kitana/kitana-included.jpg",
+          "type": "detail",
+          "description": "Kitana Included"
+        }
+      ],
+      "colors": {
+        "accent": "#6C5CE7",
+        "palette": [
+          "#FF69B4",
+          "#FFE066",
+          "#6C5CE7",
+          "#A0E7E5",
+          "#B388FF"
+        ],
+        "primary": "#FF69B4",
+        "secondary": "#FFE066"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1000,
+        "primaryPrompt": "Outfit swap of the subject wearing the Kitana costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Kitana costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Kitana costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. | Outfit swap inspired by Kitana"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Kitana costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "medieval armor",
+          "casual clothing",
+          "extra limbs",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "kitana",
+          "mortal-kombat",
+          "ninja",
+          "blue",
+          "nether-realm"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 8,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Kitana",
+        "callToAction": "Generate the Kitana look",
+        "socialPreview": "Transform into Kitana with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Kitana"
+      },
+      "affiliateLinks": [
+        {
+          "id": "kitana-affiliate",
+          "url": "https://amzn.to/4gZ4H9v",
+          "label": "Kitana Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": false,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-15T05:24:45.001Z"
+    },
+    {
+      "id": "daisy-skirt",
+      "name": "Princess Daisy (Skirt)",
+      "category": "princess",
+      "description": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "daisy-skirt-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-profile.png",
+          "type": "example",
+          "description": "Daisy Profile"
+        },
+        {
+          "id": "daisy-skirt-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-front.jpg",
+          "type": "main",
+          "description": "Daisy Front"
+        },
+        {
+          "id": "daisy-skirt-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-back.jpg",
+          "type": "detail",
+          "description": "Daisy Back"
+        },
+        {
+          "id": "daisy-skirt-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-profile.jpeg",
+          "type": "detail",
+          "description": "Daisy Profile"
+        },
+        {
+          "id": "daisy-skirt-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-layout.jpg",
+          "type": "detail",
+          "description": "Daisy Layout"
+        },
+        {
+          "id": "daisy-skirt-asset-5",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-skirt/daisy-bow.jpg",
+          "type": "detail",
+          "description": "Daisy Bow"
+        }
+      ],
+      "colors": {
+        "accent": "#6C5CE7",
+        "palette": [
+          "#FF69B4",
+          "#FFE066",
+          "#6C5CE7",
+          "#A0E7E5",
+          "#B388FF"
+        ],
+        "primary": "#FF69B4",
+        "secondary": "#FFE066"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1000,
+        "primaryPrompt": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+        "negativePrompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit. | Outfit swap inspired by Princess Daisy (Skirt)"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing a vibrant Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "distorted face",
+          "extra limbs",
+          "wrong costume",
+          "casual clothing",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "princess",
+          "daisy",
+          "super-mario",
+          "yellow"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 9,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Princess Daisy (Skirt)",
+        "callToAction": "Generate the Princess Daisy (Skirt) look",
+        "socialPreview": "Transform into Princess Daisy (Skirt) with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Princess Daisy (Skirt)"
+      },
+      "affiliateLinks": [
+        {
+          "id": "daisy-skirt-affiliate",
+          "url": "https://amzn.to/46Gxn3u",
+          "label": "Princess Daisy (Skirt) Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": false,
+      "isFeatured": false,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-15T05:24:45.779Z"
+    },
+    {
+      "id": "bowsette",
+      "name": "Bowsette",
+      "category": "bowsette",
+      "description": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "bowsette-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-square.png",
+          "type": "example",
+          "description": "Bowsette Square"
+        },
+        {
+          "id": "bowsette-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-front.jpg",
+          "type": "main",
+          "description": "Bowsette Front"
+        },
+        {
+          "id": "bowsette-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-profile.jpg",
+          "type": "detail",
+          "description": "Bowsette Profile"
+        },
+        {
+          "id": "bowsette-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-arms-up.jpg",
+          "type": "detail",
+          "description": "Bowsette Arms Up"
+        },
+        {
+          "id": "bowsette-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-horns.jpg",
+          "type": "detail",
+          "description": "Bowsette Horns"
+        },
+        {
+          "id": "bowsette-asset-5",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-crown.jpg",
+          "type": "detail",
+          "description": "Bowsette Crown"
+        },
+        {
+          "id": "bowsette-asset-6",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-skirt.jpg",
+          "type": "detail",
+          "description": "Bowsette Skirt"
+        },
+        {
+          "id": "bowsette-asset-7",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-wig.jpg",
+          "type": "detail",
+          "description": "Bowsette Wig"
+        },
+        {
+          "id": "bowsette-asset-8",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-head.png",
+          "type": "detail",
+          "description": "Bowsette Head"
+        },
+        {
+          "id": "bowsette-asset-9",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-blurred.png",
+          "type": "detail",
+          "description": "Bowsette Blurred"
+        }
+      ],
+      "colors": {
+        "accent": "#00C2A8",
+        "palette": [
+          "#6C5CE7",
+          "#FFB3C6",
+          "#00C2A8",
+          "#FFD166",
+          "#F25F5C"
+        ],
+        "primary": "#6C5CE7",
+        "secondary": "#FFB3C6"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1003,
+        "primaryPrompt": "The user uploaded a personal photo (image 1).\n          Apply the selected costume from the following reference image to create a realistic virtual try-on result.\n          Keep the user's facial expression, and skin tone.\n\n          Context: \n          Behold Bowsette, the naughtiest of the Koopa tribe and Bowser's dangerously hot cousin. \n          Her costume is a dramatic and provocative, two-piece ensemble that blends gothic \n          elegance with a rebellious, dominant edge.\n\n          The Bodice: The top is a structured, form-fitting black top with fetish-vibes and a powerful aesthetic.\n          The blue jewel sticks out as the only color on her otherwise all-black outfit.\n\n          The Skirt: The bottom is a high-waisted, short skirt composed of multiple layers of black fabric. \n          These layers are gathered and pleated, creating a voluminous, ruffled silhouette that contrasts \n          sharply with the tight bodice. \n\n          The skirt is notably short, ending high on the thighs, and its fullness adds a playful, \n          theatrical element to the otherwise severe top.\n\n          She wears sheer black stockings, a spiked choker, and a menacing horned crown and long blonde hair. \n          Her powerful stance and smoldering gaze exude dominance and playful rebellion, \n          making her the ultimate bad girl of the Mushroom Kingdom.\n\n          Photorealistic, dramatic lighting.  Spotlights shining on her from both sides.\n\n          The image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\n          Background: the moat of a castle with lava in the background.  Slightly muted contrast to emphasize \n          the detail on the corset.  \n          Avoid: No sunglasses, no frowns, no words on clothing.\n          Style: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
+        "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark, sunglasses, frowns, words on clothing",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": true,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 7,
+        "primaryReferenceIds": [
+          "bowsette-blurred",
+          "bowsette-crown",
+          "bowsette-horns",
+          "bowsette-wig"
+        ],
+        "qualityModifiers": [
+          "photorealistic",
+          "sharp focus",
+          "8K",
+          "studio lighting",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "dramatic",
+          "cinematic",
+          "soft lighting",
+          "hyper-detailed"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. | Outfit swap inspired by Bowsette"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "medieval armor",
+          "casual clothing",
+          "extra limbs",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "bowsette",
+          "super-mario",
+          "nintendo",
+          "bowser",
+          "black"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 9,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Bowsette",
+        "callToAction": "Generate the Bowsette look",
+        "socialPreview": "Transform into Bowsette with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Bowsette"
+      },
+      "affiliateLinks": [
+        {
+          "id": "bowsette-affiliate",
+          "url": "https://amzn.to/3Kvj7Cd",
+          "label": "Bowsette Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": true,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-16T12:29:42.512Z"
+    },
+    {
+      "id": "2b",
+      "name": "2b",
+      "category": "2b",
+      "description": "Outswit swap of the subject wearing a 2B costume.  Keep the same facial expressions, hairstyle, and skin tone.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "2b-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-square-3.png",
+          "type": "example",
+          "description": "2b Square 3"
+        },
+        {
+          "id": "2b-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-front.jpg",
+          "type": "main",
+          "description": "2b Front"
+        },
+        {
+          "id": "2b-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-side.jpg",
+          "type": "detail",
+          "description": "2b Side"
+        },
+        {
+          "id": "2b-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-layout.jpg",
+          "type": "detail",
+          "description": "2b Layout"
+        },
+        {
+          "id": "2b-asset-4",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-skirt-back.jpg",
+          "type": "detail",
+          "description": "2b Skirt Back"
+        },
+        {
+          "id": "2b-asset-5",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/2b/2b-back.jpg",
+          "type": "detail",
+          "description": "2b Back"
+        }
+      ],
+      "colors": {
+        "accent": "#6C5CE7",
+        "palette": [
+          "#FF69B4",
+          "#FFE066",
+          "#6C5CE7",
+          "#A0E7E5",
+          "#B388FF"
+        ],
+        "primary": "#FF69B4",
+        "secondary": "#FFE066"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1000,
+        "primaryPrompt": "Outswit swap of the subject wearing a 2B costume.  Keep the same facial expressions, hairstyle, and skin tone.",
+        "negativePrompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outswit swap of the subject wearing a 2B costume.  Keep the same facial expressions, hairstyle, and skin tone.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outswit swap of the subject wearing a 2B costume.  Keep the same facial expressions, hairstyle, and skin tone. | Outfit swap inspired by 2b"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outswit swap of the subject wearing a 2B costume.  Keep the same facial expressions, hairstyle, and skin tone. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "distorted face",
+          "extra limbs",
+          "wrong costume",
+          "casual clothing",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "2b",
+          "nier-automatica"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 10,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "2b",
+        "callToAction": "Generate the 2b look",
+        "socialPreview": "Transform into 2b with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by 2b"
+      },
+      "affiliateLinks": [
+        {
+          "id": "2b-affiliate",
+          "url": "https://amzn.to/46Gxn3u",
+          "label": "2b Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": false,
+      "isFeatured": true,
+      "createdAt": "2025-10-15T05:24:39.424Z",
+      "updatedAt": "2025-10-15T05:24:39.424Z"
+    },
+    {
+      "id": "chun-li",
+      "name": "Chun-Li",
+      "category": "chun-li",
+      "description": "Outfit swap of the subject wearing the Chun-Li costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+      "version": "1.0.0",
+      "assets": [
+        {
+          "id": "chun-li-asset-0",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/chun-b-enlarged.png",
+          "type": "example",
+          "description": "Chun B Enlarged"
+        },
+        {
+          "id": "chun-li-asset-1",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-classic-front.jpg",
+          "type": "main",
+          "description": "Chun Classic Front"
+        },
+        {
+          "id": "chun-li-asset-2",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-classic-back.jpg",
+          "type": "detail",
+          "description": "Chun Classic Back"
+        },
+        {
+          "id": "chun-li-asset-3",
+          "url": "https://f004.backblazeb2.com/file/waifu-test/costumes/chun-li-classic/chun-black-front.jpg",
+          "type": "detail",
+          "description": "Chun Black Front"
+        }
+      ],
+      "colors": {
+        "accent": "#6C5CE7",
+        "palette": [
+          "#FF69B4",
+          "#FFE066",
+          "#6C5CE7",
+          "#A0E7E5",
+          "#B388FF"
+        ],
+        "primary": "#FF69B4",
+        "secondary": "#FFE066"
+      },
+      "aiGeneration": {
+        "model": "seedream-v4",
+        "seed": 1000,
+        "primaryPrompt": "Outfit swap of the subject wearing the Chun-Li costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark",
+        "steps": 30,
+        "resolution": "auto",
+        "showExplicitContent": false,
+        "numOutputs": 1,
+        "referenceStrategy": "priority-order",
+        "maxReferences": 5,
+        "primaryReferenceIds": [],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "styleEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ],
+        "modelOptions": {}
+      },
+      "transformation": {
+        "base": "Outfit swap of the subject wearing the Chun-Li costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
+        "variations": [
+          {
+            "style": "default",
+            "prompt": "Outfit swap of the subject wearing the Chun-Li costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. | Outfit swap inspired by Chun-Li"
+          },
+          {
+            "style": "cinematic",
+            "prompt": "Outfit swap of the subject wearing the Chun-Li costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit. with cinematic lighting, dramatic highlights, high fidelity fabric details"
+          }
+        ],
+        "negativePrompts": [
+          "low quality",
+          "blurry",
+          "medieval armor",
+          "casual clothing",
+          "extra limbs",
+          "watermark"
+        ],
+        "qualityModifiers": [
+          "studio lighting",
+          "high detail",
+          "color accuracy"
+        ],
+        "detailEnhancements": [
+          "costume accuracy",
+          "fabric texture enhancement",
+          "accessory emphasis"
+        ]
+      },
+      "metadata": {
+        "tags": [
+          "chun-li",
+          "street-fighter",
+          "capcom",
+          "blue",
+          "black"
+        ],
+        "season": "evergreen",
+        "difficulty": "medium",
+        "popularityScore": 10,
+        "compatibleModels": [
+          "seedream-v4"
+        ],
+        "estimatedProcessingTime": 45
+      },
+      "marketing": {
+        "displayName": "Chun-Li",
+        "callToAction": "Generate the Chun-Li look",
+        "socialPreview": "Transform into Chun-Li with AI-enhanced outfit swap",
+        "shortDescription": "Outfit swap inspired by Chun-Li"
+      },
+      "affiliateLinks": [
+        {
+          "id": "chun-li-affiliate",
+          "url": "https://amzn.to/3KvTxgn",
+          "label": "Chun-Li Costume",
+          "source": "Other"
+        }
+      ],
+      "isActive": true,
+      "isPremium": false,
+      "isNew": true,
+      "isFeatured": false,
+      "createdAt": "2025-10-10T19:40:43.313Z",
+      "updatedAt": "2025-10-15T05:24:43.551Z"
+    }
+  ]
+}

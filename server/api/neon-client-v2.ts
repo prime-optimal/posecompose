@@ -38,6 +38,7 @@ interface DBCostumeRow {
 	updated_at: string | Date | null
 	notes?: string | null
 	inspiration?: string | null
+	ai_settings?: CostumePresetV2['aiGeneration'] | null
 }
 
 interface DBAIGenerationRow {
@@ -58,6 +59,42 @@ interface DBAIGenerationRow {
 	quality_modifiers: string[]
 	style_enhancements: string[]
 	model_options: Record<string, unknown>
+	created_at: string | Date | null
+	updated_at: string | Date | null
+}
+
+interface DBEnhancedAIGenerationRow {
+	id: string
+	costume_id: string
+	model: string
+	seed?: number | null
+	primary_prompt?: string | null
+	fallback_prompt?: string | null
+	negative_prompt?: string | null
+	steps?: number | null
+	resolution?: string | null
+	show_explicit_content?: boolean | null
+	num_outputs?: number | null
+	reference_strategy?: string | null
+	max_references?: number | null
+	primary_reference_ids?: string[] | null
+	quality_modifiers?: string[] | null
+	style_enhancements?: string[] | null
+	model_options?: Record<string, unknown> | null
+	created_at: string | Date | null
+	updated_at: string | Date | null
+}
+
+interface DBAIReferenceRow {
+	id: string
+	costume_id: string
+	url: string
+	type: string
+	role: string
+	priority?: number | null
+	description?: string | null
+	is_primary?: boolean | null
+	sort_order?: number | null
 	created_at: string | Date | null
 	updated_at: string | Date | null
 }
@@ -109,16 +146,40 @@ const mapAIGenerationRow = (row: DBAIGenerationRow): CostumeAIGeneration => ({
 	modelOptions: row.model_options,
 })
 
-const mapCostumeRow = (row: DBCostumeRow, assets: (CostumeAsset & { priority?: number })[], aiGeneration?: CostumeAIGeneration | null): CostumePresetV2 => ({
+const mapEnhancedAIGenerationRow = (row: DBEnhancedAIGenerationRow, references: DBAIReferenceRow[]): CostumeAIGeneration => ({
+	model: row.model as 'seedream-v4' | 'google:4@1' | 'background-remover',
+	seed: row.seed ?? 1000,
+	primaryPrompt: row.primary_prompt ?? '',
+	fallbackPrompt: row.fallback_prompt ?? undefined,
+	negativePrompt: row.negative_prompt ?? undefined,
+	steps: row.steps ?? 30,
+	resolution: (row.resolution as 'auto' | '1024x1024' | '512x512' | '768x768') ?? 'auto',
+	showExplicitContent: row.show_explicit_content ?? false,
+	numOutputs: row.num_outputs ?? 1,
+	referenceStrategy: (row.reference_strategy as 'auto' | 'priority-order' | 'random' | 'best-match') ?? 'priority-order',
+	maxReferences: row.max_references ?? 5,
+	primaryReferenceIds: row.primary_reference_ids ?? [],
+	qualityModifiers: row.quality_modifiers ?? [],
+	styleEnhancements: row.style_enhancements ?? [],
+	modelOptions: row.model_options ?? {},
+})
+
+const mapCostumeRow = (
+	row: DBCostumeRow,
+	assets: (CostumeAsset & { priority?: number })[],
+	aiGeneration?: CostumeAIGeneration | null,
+	enhancedAiGeneration?: CostumeAIGeneration | null,
+	aiSettings?: any
+): CostumePresetV2 => ({
 	id: row.id,
 	name: row.name,
 	category: decodeCategory(row.category_id),
 	description: row.description ?? '',
 	version: row.version ?? '1.0.0',
-	assets: assets.map(({ priority, ...asset }) => asset), // Remove priority for legacy compatibility
+	assets, // Keep priority for V2 consumers
 	colors: row.colors,
-	// Use AI generation settings if available, otherwise create defaults
-	aiGeneration: aiGeneration ?? {
+	// Use enhanced AI generation settings first, then legacy, then ai_settings, then defaults
+	aiGeneration: enhancedAiGeneration ?? aiGeneration ?? row.ai_settings ?? {
 		model: 'seedream-v4',
 		seed: 1000,
 		primaryPrompt: row.transformation.base,
@@ -152,6 +213,8 @@ const mapCostumeRow = (row: DBCostumeRow, assets: (CostumeAsset & { priority?: n
 			: row.updated_at?.toISOString?.() ?? new Date().toISOString(),
 	notes: row.notes ?? undefined,
 	inspiration: row.inspiration ?? undefined,
+	// Include aiSettings for backward compatibility
+	...(aiSettings && { aiSettings }),
 })
 
 const fetchAssetsForCostume = async (sql: NeonQueryFunction<false, false>, costumeId: string) => {
@@ -181,6 +244,32 @@ const fetchAIGenerationForCostume = async (sql: NeonQueryFunction<false, false>,
 	return mapAIGenerationRow(row)
 }
 
+const fetchEnhancedAIGenerationForCostume = async (sql: NeonQueryFunction<false, false>, costumeId: string): Promise<{ aiGeneration: CostumeAIGeneration | null; references: DBAIReferenceRow[] }> => {
+	// Fetch enhanced AI generation settings
+	const aiRows = await sql`
+		SELECT *
+		FROM costume_ai_generation_enhanced
+		WHERE costume_id = ${costumeId}
+		LIMIT 1
+	` as DBEnhancedAIGenerationRow[]
+
+	// Fetch AI references
+	const referenceRows = await sql`
+		SELECT *
+		FROM costume_ai_references
+		WHERE costume_id = ${costumeId}
+		ORDER BY sort_order ASC, priority DESC
+	` as DBAIReferenceRow[]
+
+	const aiRow = aiRows[0]
+	const aiGeneration = aiRow ? mapEnhancedAIGenerationRow(aiRow, referenceRows) : null
+
+	return {
+		aiGeneration,
+		references: referenceRows,
+	}
+}
+
 const fetchCostumesFromNeon = async (): Promise<CostumePresetV2[]> => {
 	const sql = getSqlClient()
 	if (!sql) {
@@ -188,7 +277,7 @@ const fetchCostumesFromNeon = async (): Promise<CostumePresetV2[]> => {
 	}
 
 	const rows = await sql`
-		SELECT *
+		SELECT *, ai_settings
 		FROM costumes
 		WHERE is_active = true
 		ORDER BY sort_order ASC NULLS LAST, created_at DESC
@@ -198,7 +287,10 @@ const fetchCostumesFromNeon = async (): Promise<CostumePresetV2[]> => {
 	for (const row of rows) {
 		const assets = await fetchAssetsForCostume(sql, row.id)
 		const aiGeneration = await fetchAIGenerationForCostume(sql, row.id)
-		costumes.push(mapCostumeRow(row, assets, aiGeneration))
+		const { aiGeneration: enhancedAiGeneration, references } = await fetchEnhancedAIGenerationForCostume(sql, row.id)
+		
+		// Include aiSettings for backward compatibility
+		costumes.push(mapCostumeRow(row, assets, aiGeneration, enhancedAiGeneration, row.ai_settings))
 	}
 
 	return costumes
@@ -211,7 +303,7 @@ const fetchCostumeFromNeon = async (id: string): Promise<CostumePresetV2 | null>
 	}
 
 	const rows = await sql`
-		SELECT *
+		SELECT *, ai_settings
 		FROM costumes
 		WHERE id = ${id}
 		LIMIT 1
@@ -224,7 +316,9 @@ const fetchCostumeFromNeon = async (id: string): Promise<CostumePresetV2 | null>
 
 	const assets = await fetchAssetsForCostume(sql, row.id)
 	const aiGeneration = await fetchAIGenerationForCostume(sql, row.id)
-	return mapCostumeRow(row, assets, aiGeneration)
+	const { aiGeneration: enhancedAiGeneration, references } = await fetchEnhancedAIGenerationForCostume(sql, row.id)
+	
+	return mapCostumeRow(row, assets, aiGeneration, enhancedAiGeneration, row.ai_settings)
 }
 
 // Backward compatibility functions that return the original CostumePreset type

@@ -54,29 +54,29 @@
       "primary": "#6C5CE7",
       "secondary": "#FFB3C6"
     },
-    "aiGeneration": {
+    "aiSettings": {
+      "seed": 1004,
       "model": "seedream-v4",
-      "seed": 1000,
-      "primaryPrompt": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
-      "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark",
       "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\nKeep the users hairstyle, facial expression and skin tone.\n\nContext:\nA realistic, true to life Rosalina from Super Mario Kart. \nA seductive reimagining of Rosalina, the classic gaming princess. \nShe wears a daring, form-fitting pale blue bustier that reveals \nher midriff and a hint of cleavage. The voluminous skirt is slit high, \noffering a playful glimpse of her legs. \nDramatic, wide sleeves with delicate white lace frame her alluring pose. \nA sparkling silver, jeweled crown rests on her hair, completing this naughty \nyet elegant tribute to the celestial princess. Photorealistic, soft lighting.\n\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\nBackground: She is at a classy, masquerade ball.  Lots of people are around, but out of focus and slightly in the shadows.\nAvoid: No sunglasses, no frowns, no words on clothing.\nStyle: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
       "resolution": "auto",
-      "showExplicitContent": false,
-      "numOutputs": 1,
-      "referenceStrategy": "priority-order",
-      "maxReferences": 5,
-      "primaryReferenceIds": [],
-      "qualityModifiers": [
-        "studio lighting",
-        "high detail",
-        "color accuracy"
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-blurred.png",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-crown.jpg"
       ],
-      "styleEnhancements": [
-        "costume accuracy",
-        "fabric texture enhancement",
-        "accessory emphasis"
+      "showExplicitContent": true
+    },
+    "aiGeneration": {
+      "seed": 1004,
+      "model": "seedream-v4",
+      "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\nKeep the users hairstyle, facial expression and skin tone.\n\nContext:\nA realistic, true to life Rosalina from Super Mario Kart. \nA seductive reimagining of Rosalina, the classic gaming princess. \nShe wears a daring, form-fitting pale blue bustier that reveals \nher midriff and a hint of cleavage. The voluminous skirt is slit high, \noffering a playful glimpse of her legs. \nDramatic, wide sleeves with delicate white lace frame her alluring pose. \nA sparkling silver, jeweled crown rests on her hair, completing this naughty \nyet elegant tribute to the celestial princess. Photorealistic, soft lighting.\n\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\nBackground: She is at a classy, masquerade ball.  Lots of people are around, but out of focus and slightly in the shadows.\nAvoid: No sunglasses, no frowns, no words on clothing.\nStyle: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
+      "resolution": "auto",
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-blurred.png",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/rosalina/rosalina-crown.jpg"
       ],
-      "modelOptions": {}
+      "showExplicitContent": true
     },
     "transformation": {
       "base": "Outfit swap of the subject wearing the Rosalina costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
@@ -144,7 +144,7 @@
     "isNew": true,
     "isFeatured": false,
     "createdAt": "2025-10-10T19:40:43.313Z",
-    "updatedAt": "2025-10-15T05:24:44.225Z"
+    "updatedAt": "2025-10-16T13:37:24.844Z"
   },
   {
     "id": "daisy-bodysuit",
@@ -201,29 +201,25 @@
       "primary": "#FF8A80",
       "secondary": "#81D4FA"
     },
-    "aiGeneration": {
+    "aiSettings": {
+      "seed": 1001,
       "model": "seedream-v4",
-      "seed": 1000,
-      "primaryPrompt": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
-      "negativePrompt": "low quality, blurry, distorted face, extra limbs, wrong costume, casual clothing, watermark",
       "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\n\nContext:\nA highly detailed full-body rendering of Princess Daisy's\nracing suit costume from Super Mario Kart.\nFocus on the outfits design and materials.\nThe costume is a sleek, form-fitting bodysuit made of glossy yellow\nand bright orange late with reflective, vinyl-like texture.\nOrange panels run down the arms and sides, complemented by white stripe accents at the wrists.\nA gold belt with a square buckle cinches the waist.\nThe cut of the bodysuit shows off her bare thighs.\nThe chest area has a small green gemstone brooch resembling a daisy flower emblem.\nInclude long orange gloves that match the suit, and a small,\ndetailed golden crown adorned with red and green jewels positioned above her head.\nThe lighting should highlight the costumes shimmer and contours, evoking the clean,\nvibrant aesthetic of Nintendo character design.\nNeutral background, studio lighting.\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\nKeep the users hairstyle, facial expression and skin tone.",
       "resolution": "auto",
-      "showExplicitContent": false,
-      "numOutputs": 1,
-      "referenceStrategy": "priority-order",
-      "maxReferences": 5,
-      "primaryReferenceIds": [],
-      "qualityModifiers": [
-        "studio lighting",
-        "high detail",
-        "color accuracy"
-      ],
-      "styleEnhancements": [
-        "costume accuracy",
-        "fabric texture enhancement",
-        "accessory emphasis"
-      ],
-      "modelOptions": {}
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-blurred.png"
+      ]
+    },
+    "aiGeneration": {
+      "seed": 1001,
+      "model": "seedream-v4",
+      "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\n\nContext:\nA highly detailed full-body rendering of Princess Daisy's\nracing suit costume from Super Mario Kart.\nFocus on the outfits design and materials.\nThe costume is a sleek, form-fitting bodysuit made of glossy yellow\nand bright orange late with reflective, vinyl-like texture.\nOrange panels run down the arms and sides, complemented by white stripe accents at the wrists.\nA gold belt with a square buckle cinches the waist.\nThe cut of the bodysuit shows off her bare thighs.\nThe chest area has a small green gemstone brooch resembling a daisy flower emblem.\nInclude long orange gloves that match the suit, and a small,\ndetailed golden crown adorned with red and green jewels positioned above her head.\nThe lighting should highlight the costumes shimmer and contours, evoking the clean,\nvibrant aesthetic of Nintendo character design.\nNeutral background, studio lighting.\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\nKeep the users hairstyle, facial expression and skin tone.",
+      "resolution": "auto",
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-bodysuit/daisy-bodysuit-blurred.png"
+      ]
     },
     "transformation": {
       "base": "Outfit swap of the subject wearing the Princess Daisy costume.  Keep the same facial expression, lighting, and pose. Include the crown. Change the fabrics and fit.",
@@ -291,7 +287,7 @@
     "isNew": true,
     "isFeatured": true,
     "createdAt": "2025-10-10T19:40:43.313Z",
-    "updatedAt": "2025-10-15T05:24:40.517Z"
+    "updatedAt": "2025-10-16T13:37:24.780Z"
   },
   {
     "id": "peach-skirt",
@@ -837,29 +833,39 @@
       "primary": "#6C5CE7",
       "secondary": "#FFB3C6"
     },
-    "aiGeneration": {
+    "aiSettings": {
+      "seed": 1003,
       "model": "seedream-v4",
-      "seed": 1000,
-      "primaryPrompt": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
-      "negativePrompt": "low quality, blurry, medieval armor, casual clothing, extra limbs, watermark",
       "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\nKeep the user's facial expression, and skin tone.\n\nContext: \nBehold Bowsette, the naughtiest of the Koopa tribe and Bowser's dangerously hot cousin. \nHer costume is a dramatic and provocative, two-piece ensemble that blends gothic \nelegance with a rebellious, dominant edge.\n\nThe Bodice: The top is a structured, form-fitting black top with fetish-vibes and a powerful aesthetic.\nThe blue jewel sticks out as the only color on her otherwise all-black outfit.\n\nThe Skirt: The bottom is a high-waisted, short skirt composed of multiple layers of black fabric. \nThese layers are gathered and pleated, creating a voluminous, ruffled silhouette that contrasts \nsharply with the tight bodice. \n\nThe skirt is notably short, ending high on the thighs, and its fullness adds a playful, \ntheatrical element to the otherwise severe top.\n\nShe wears sheer black stockings, a spiked choker, and a menacing horned crown and long blonde hair. \nHer powerful stance and smoldering gaze exude dominance and playful rebellion, \nmaking her the ultimate bad girl of the Mushroom Kingdom.\n\nPhotorealistic, dramatic lighting.  Spotlights shining on her from both sides.\n\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\nBackground: the moat of a castle with lava in the background.  Slightly muted contrast to emphasize \nthe detail on the corset.  \nAvoid: No sunglasses, no frowns, no words on clothing.\nStyle: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
       "resolution": "auto",
-      "showExplicitContent": false,
-      "numOutputs": 1,
-      "referenceStrategy": "priority-order",
-      "maxReferences": 5,
-      "primaryReferenceIds": [],
-      "qualityModifiers": [
-        "studio lighting",
-        "high detail",
-        "color accuracy"
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-blurred.png",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-crown.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-horns.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-wig.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-empty.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-skirt.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-arms-up.jpg"
       ],
-      "styleEnhancements": [
-        "costume accuracy",
-        "fabric texture enhancement",
-        "accessory emphasis"
+      "showExplicitContent": true
+    },
+    "aiGeneration": {
+      "seed": 1003,
+      "model": "seedream-v4",
+      "steps": 30,
+      "prompt": "The user uploaded a personal photo (image 1).\nApply the selected costume from the following reference image to create a realistic virtual try-on result.\nKeep the user's facial expression, and skin tone.\n\nContext: \nBehold Bowsette, the naughtiest of the Koopa tribe and Bowser's dangerously hot cousin. \nHer costume is a dramatic and provocative, two-piece ensemble that blends gothic \nelegance with a rebellious, dominant edge.\n\nThe Bodice: The top is a structured, form-fitting black top with fetish-vibes and a powerful aesthetic.\nThe blue jewel sticks out as the only color on her otherwise all-black outfit.\n\nThe Skirt: The bottom is a high-waisted, short skirt composed of multiple layers of black fabric. \nThese layers are gathered and pleated, creating a voluminous, ruffled silhouette that contrasts \nsharply with the tight bodice. \n\nThe skirt is notably short, ending high on the thighs, and its fullness adds a playful, \ntheatrical element to the otherwise severe top.\n\nShe wears sheer black stockings, a spiked choker, and a menacing horned crown and long blonde hair. \nHer powerful stance and smoldering gaze exude dominance and playful rebellion, \nmaking her the ultimate bad girl of the Mushroom Kingdom.\n\nPhotorealistic, dramatic lighting.  Spotlights shining on her from both sides.\n\nThe image should emphasize craftsmanship, fabric details, and authentic video game character costuming.\n\nBackground: the moat of a castle with lava in the background.  Slightly muted contrast to emphasize \nthe detail on the corset.  \nAvoid: No sunglasses, no frowns, no words on clothing.\nStyle: hyper-detailed, photorealistic, cinematic lighting, sharp focus, 8K.",
+      "resolution": "auto",
+      "referenceUrls": [
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-blurred.png",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-crown.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-horns.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-wig.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-empty.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-skirt.jpg",
+        "https://f004.backblazeb2.com/file/waifu-test/costumes/bowsette/bowsette-arms-up.jpg"
       ],
-      "modelOptions": {}
+      "showExplicitContent": true
     },
     "transformation": {
       "base": "Outfit swap of the subject wearing the Bowsette costume.  Keep the same facial expression, lighting, and pose.  Include the crown.  Change the fabrics and fit.",
@@ -927,7 +933,7 @@
     "isNew": true,
     "isFeatured": true,
     "createdAt": "2025-10-10T19:40:43.313Z",
-    "updatedAt": "2025-10-15T05:24:42.217Z"
+    "updatedAt": "2025-10-16T13:37:24.711Z"
   },
   {
     "id": "2b",

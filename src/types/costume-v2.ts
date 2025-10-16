@@ -97,6 +97,17 @@ export interface CostumePresetV2 {
   // AI generation (enhanced)
   aiGeneration: CostumeAIGeneration;
   
+  // Legacy AI settings (from database JSONB for backward compatibility)
+  aiSettings?: {
+    model?: string;
+    prompt?: string;
+    steps?: number;
+    seed?: number;
+    resolution?: 'auto' | '512x512' | '1024x1024';
+    showExplicitContent?: boolean;
+    referenceUrls?: string[];
+  };
+  
   // Legacy transformation (for backward compatibility)
   transformation: TransformationPrompt;
   

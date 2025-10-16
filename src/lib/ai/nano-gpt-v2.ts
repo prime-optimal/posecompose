@@ -15,7 +15,6 @@ export interface NanoGptReference {
 	kind: NanoGptReferenceKind
 	value: string
 	role: 'user' | 'costume' | 'background'
-	weight?: number
 	mimeType?: string
 }
 

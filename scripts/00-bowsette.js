@@ -2,7 +2,7 @@
 
 /**
  * Test using only imageDataUrls array for multiple images with realistic prompt
- * Usage: bun scripts/test-multiple-images-array.js [model]
+ * Usage: bun scripts/multiple-images-array-working.js [model]
  * Models: seedream-v4, google:4@1, background-remover
  */
 
@@ -15,7 +15,7 @@ const availableModels = ['seedream-v4', 'google:4@1', 'background-remover']
 // Check for help flag
 if (args.includes('--help') || args.includes('-h')) {
   console.log(`
-Usage: bun scripts/test-multiple-images-array.js [model] [options]
+Usage: bun scripts/multiple-images-array-working.js [model] [options]
 
 Models:
   seedream-v4      - Default model, supports up to 10 reference images
@@ -23,9 +23,9 @@ Models:
   background-remover - Background removal model, supports 1 reference image
 
 Examples:
-  bun scripts/test-multiple-images-array.js                    # Use default seedream-v4 model
-  bun scripts/test-multiple-images-array.js google:4@1         # Use Google model
-  bun scripts/test-multiple-images-array.js --help             # Show this help
+  bun scripts/multiple-images-array-working.js                    # Use default seedream-v4 model
+  bun scripts/multiple-images-array-working.js google:4@1         # Use Google model
+  bun scripts/multiple-images-array-working.js --help             # Show this help
 
 Features:
   - Uses costume URLs instead of base64 for efficiency

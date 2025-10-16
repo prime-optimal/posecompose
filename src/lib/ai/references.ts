@@ -1,6 +1,6 @@
 import type { CostumeAsset, CostumePreset } from '@/types/costume'
-import type { NanoGptModel, NanoGptReference } from './nano-gpt'
-import { MODEL_REFERENCE_LIMITS } from './nano-gpt'
+import type { NanoGptModel, NanoGptReference } from './nano-gpt-v2'
+import { MODEL_REFERENCE_LIMITS } from './nano-gpt-v2'
 
 export const SAMPLE_SELFIE_REFERENCE_URL = 'https://f004.backblazeb2.com/file/waifu-test/uploads/11.jpeg'
 export const SAMPLE_COSTUME_REFERENCE_URL = 'https://f004.backblazeb2.com/file/waifu-test/waifu-test/costumes/daisy-01.png'
@@ -63,7 +63,6 @@ export const buildNanoGptReferences = ({
 				kind: 'base64',
 				value: selfieBase64,
 				role: 'user',
-				weight: 1.2,
 				mimeType: selfieMimeType ?? 'image/jpeg',
 			})
 		} else if (includeFallback) {
@@ -86,7 +85,6 @@ export const buildNanoGptReferences = ({
 			kind: 'base64',
 			value: selfieBase64,
 			role: 'user',
-			weight: 1.5,
 			mimeType: selfieMimeType ?? 'image/jpeg',
 		})
 	}
@@ -113,12 +111,12 @@ export const buildNanoGptReferences = ({
 				kind: 'url',
 				value: url,
 				role: 'costume',
-				weight: 1,
 			})
 		}
 	})
 
 	if (references.length < limit && includeFallback) {
+		// Add fallback costume reference
 		references.push({
 			id: 'fallback-costume',
 			kind: 'url',
@@ -126,6 +124,7 @@ export const buildNanoGptReferences = ({
 			role: 'costume',
 		})
 
+		// If no user selfie was provided, add fallback selfie at the beginning
 		if (!selfieBase64) {
 			references.unshift({
 				id: 'fallback-selfie',

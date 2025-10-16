@@ -199,34 +199,31 @@ bun install
 bun run dev
 ```
 
-### API Server (Neon Database)
+### Costume API + Neon Data
 
-The API server serves costume data from Neon PostgreSQL with local JSON fallback:
+Run the API server from project root so `.env` loads:
 
 ```sh
-# From root directory (IMPORTANT - must run from root to load .env properly)
-bun run server/api/index.ts
-
-# Or use the npm script:
 bun run serve:api
 ```
 
-> **Critical**: The API server must be run from the root directory to properly load environment variables from `.env`. Running from `server/` directory will cause fallback to local JSON data.
-
-### Database Seeding
-
-Seed the Neon database with costume data:
+Seed databases:
 
 ```sh
-# From root directory
-bun run scripts/seed-neon-costumes.ts
-
-# Or use the npm script:
+# Costume metadata + assets
 bun run seed:costumes
+
+# Tuned AI overrides (Bowsette, Daisy Bodysuit, Rosalina)
+bun run seed:ai
 ```
 
-Optional flags:
-- `--preserve-assets`: Update costume data but keep existing assets
+Refresh build-time JSON (optional):
+
+```sh
+bun run build:data
+```
+
+> All scripts require `NEON_DATABASE_URL` (and optional `NEON_DATABASE_URL_READONLY`) in `.env`.
 
 ### Build & Deploy
 
@@ -247,9 +244,9 @@ Outputs land in `dist/`. Deploy that directory or rely on Vercel's static output
 Testing & QA
 ------------
 
-- Lint: `bun run lint` (or `npm run lint`).
-- Unit tests (coming soon) will live under `src/__tests__` and execute via `bun test`.
-- Manual QA checklist lives in `docs/TODO.md` (kept evergreen per feature branch).
+- Type check + lint: `bunx tsc --noEmit && bun run lint`
+- Optionally run targeted AI scripts/tests under `scripts/test-*.ts`
+- Manual QA checklist lives in `docs/TODO.md`
 
 ## Troubleshooting
 

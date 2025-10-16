@@ -1,130 +1,47 @@
-# AI Generation Integration - Complete Solution
+# AI Generation Integration – Costume ai_settings Rollout
 
-## Problem Diagnosis
+## Overview
 
-The original issue was that costume-specific AI generation settings (seeds, prompts, models) were hardcoded in individual script files rather than stored in the database. This created a disconnect between the UI and the actual AI generation parameters.
+We now persist “tuned” AI overrides per costume directly on the `costumes` table via a new `ai_settings` JSONB column. This keeps prompts, seeds, model overrides, and reference URLs co-located with catalog metadata while remaining optional when Neon is unavailable.
 
-### Root Causes Identified
+### Goals
+- Make Bowsette, Daisy Bodysuit, and Rosalina use vetted settings automatically during generation
+- Provide a Bun script for keeping Neon in sync
+- Surface `aiSettings` through the API, type layer, and frontend generator
+- Retain graceful fallback behaviour when `ai_settings` is `NULL`
 
-1. **Missing Database Schema**: No table to store AI generation parameters per costume
-2. **Prompt Engineering Gap**: Simple generic prompts vs. detailed script prompts  
-3. **Reference Selection Logic**: Inconsistent reference image prioritization
-4. **Model Configuration Differences**: Hardcoded settings vs. defaults
-5. **Seed Management**: No centralized seed storage system
+## Implementation Summary
 
-## Solution Implementation
+| Area | Update |
+| --- | --- |
+| Database | Added migration `db/migrations/2025-10-16-add-ai-settings.sql` to append `ai_settings JSONB DEFAULT NULL` on `costumes`. |
+| Seeding | New script `bun run seed:ai` upserts tuned settings (model, prompt, seed, showExplicitContent, referenceUrls). |
+| API | `neon-client.ts`/`neon-client-v2.ts` select `ai_settings` and include it in responses (`CostumePreset.aiSettings`). |
+| Frontend Types | `src/types/extracted-costume-settings.ts` exports `AiGenerationSettings`; `CostumePreset` exposes optional `aiSettings`. |
+| Generation Flow | `AIGenerationService` merges `costume.aiSettings` with existing `aiGeneration` data and prefers `referenceUrls`, prompt, seed, etc. |
+| Build Data | `scripts/fetch-costumes.mjs` writes `aiSettings` alongside catalog JSON for static fallback. |
 
-### 1. Database Schema Updates
+## Verification Playbook
 
-Created `costume_ai_generation` table with fields for:
-- Model selection and configuration
-- Seeds for consistent results
-- Detailed prompts and negative prompts
-- Reference image strategies
-- Quality and style modifiers
-- Model-specific options
+1. **Apply migration** (if not already run)
+   ```sh
+   bun run migrate:local # or run the SQL migration manually
+   ```
+2. **Seed tuned overrides**
+   ```sh
+   bun run seed:ai
+   ```
+3. **Run API & frontend**
+   ```sh
+   bun run serve:api
+   bun run dev
+   ```
+4. **Inspect API response** – `/api/costumes` items should include `aiGeneration` plus optional `aiSettings` for tuned slugs.
+5. **Generate Bowsette/Daisy/Rosalina** – Confirm logs show tuned model, seed, resolution, prompt, and reference URLs.
 
-### 2. Settings Extraction System
+## Notes & Follow-ups
 
-Built automated extraction tools to pull settings from existing scripts:
-- `extract-costume-settings-fixed.ts` - Extracts settings from script files
-- `simple-insert.ts` - Inserts settings into database
-- Captures seeds, prompts, URLs, and generation parameters
-
-### 3. Enhanced AI Generation Service
-
-Created `AIGenerationService` class that:
-- Uses costume-specific settings from database
-- Implements multiple reference strategies (priority-order, best-match, random)
-- Handles seed management for consistent results
-- Applies costume-specific quality and style modifiers
-
-### 4. Updated Components
-
-- `GenerationLoungeV2.tsx` - Uses new AI generation service
-- `neon-client-v2.ts` - Enhanced database client with AI settings support
-- `costume-v2.ts` - Extended type definitions
-
-## Test Results
-
-Comprehensive testing shows **76.9% success rate** (10/13 tests passed):
-
-✅ **Working Components:**
-- Database schema and queries
-- AI generation service
-- Database vs script settings comparison
-- Request building with proper parameters
-
-⚠️ **Minor Issues:**
-- Extraction test validation (non-critical)
-- Some reference ID validations (cosmetic)
-
-## Key Improvements
-
-### Before
-- Generic prompts: "Outfit swap of the subject wearing the costume"
-- Default seeds and model settings
-- Basic reference image selection
-- No costume-specific optimizations
-
-### After
-- Detailed prompts: 1000+ character costume-specific descriptions
-- Proper seed management (rosalina: 1004, bowsette: 1003, daisy: 1001)
-- Strategic reference image prioritization
-- Costume-specific quality and style modifiers
-
-## Files Created/Modified
-
-### Database & Schema
-- `scripts/create-ai-table.ts` - Creates AI generation table
-- `scripts/simple-insert.ts` - Inserts costume settings
-- `server/types/costume-v2.ts` - Enhanced type definitions
-
-### Services & Components
-- `src/lib/ai/ai-generation-service.ts` - Core AI generation service
-- `src/components/GenerationLoungeV2.tsx` - Updated generation component
-- `server/api/neon-client-v2.ts` - Enhanced database client
-
-### Extraction & Testing
-- `scripts/extract-costume-settings-fixed.ts` - Settings extraction
-- `scripts/test-complete-integration.ts` - Comprehensive testing
-
-## Next Steps
-
-1. **Add Remaining Costumes**: Extract settings for all costume scripts
-2. **UI Integration**: Update costume selection to use new service
-3. **Performance Optimization**: Cache database settings
-4. **Monitoring**: Add metrics for AI generation quality
-
-## Migration Guide
-
-### For Existing Costumes
-```bash
-# 1. Extract settings from scripts
-bun scripts/extract-costume-settings-fixed.ts
-
-# 2. Create database table
-bun scripts/create-ai-table.ts
-
-# 3. Insert settings
-bun scripts/simple-insert.ts
-
-# 4. Test integration
-bun scripts/test-complete-integration.ts
-```
-
-### For New Costumes
-1. Add settings to `costume_ai_generation` table
-2. Include primaryPrompt, seed, model, and reference strategy
-3. Test with AI generation service
-
-## Impact
-
-This integration provides:
-- **Consistent Results**: Proper seed management
-- **Higher Quality**: Detailed, costume-specific prompts
-- **Better Performance**: Optimized reference selection
-- **Easier Maintenance**: Centralized settings management
-- **Scalability**: Easy to add new costumes with specific settings
-
-The solution successfully bridges the gap between the hardcoded script settings and the database-driven UI, ensuring that the AI generation uses the optimal parameters for each costume.
+- `ai_settings` is optional: when `NULL`, the generator falls back to legacy `aiGeneration` defaults.
+- Bowsette and Rosalina remain `showExplicitContent: true`; Daisy enforces `false`.
+- Future costumes can be appended to `scripts/seed-ai-settings.ts` once validated.
+- Consider porting remaining costumes from legacy `costume_ai_generation` table if still needed, then retire that table.

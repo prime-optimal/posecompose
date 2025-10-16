@@ -22,6 +22,7 @@ const rows = await sql`
     c.transformation,
     c.marketing,
     c.affiliate_links,
+    c.ai_settings,
     c.sort_order,
     c.is_active,
     c.is_premium,
@@ -60,8 +61,9 @@ const costumes = rows.map(row => ({
   version: row.version || '1.0.0',
   assets: row.assets || [],
   colors: row.colors,
+  aiSettings: row.ai_settings ?? null,
   // Create basic AI generation settings from transformation data
-  aiGeneration: {
+  aiGeneration: row.ai_settings ?? {
     model: 'seedream-v4',
     seed: 1000,
     primaryPrompt: row.transformation?.base || 'Transform into costume',
@@ -89,7 +91,8 @@ const costumes = rows.map(row => ({
   createdAt: row.created_at,
   updatedAt: row.updated_at,
   notes: undefined,
-  inspiration: undefined
+  inspiration: undefined,
+  aiSettings: row.ai_settings ?? undefined
 }));
 
 await writeFile('public/costumes.json', JSON.stringify(costumes, null, 2));

@@ -1,4 +1,4 @@
-import type { CostumePreset, CostumeCategory, CostumeAffiliateLink } from '@/types/costume';
+import type { CostumePreset, CostumeCategory, CostumeAffiliateLink } from '@/types/costume'
     
 // Helper function for creating affiliate links
 const createAffiliateLink = (

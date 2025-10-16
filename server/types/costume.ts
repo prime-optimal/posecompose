@@ -47,6 +47,16 @@ export interface CostumeAffiliateLink {
   description?: string
 }
 
+export interface CostumeAiSettings {
+  model?: string
+  prompt?: string
+  steps?: number
+  seed?: number
+  resolution?: 'auto' | '512x512' | '1024x1024'
+  showExplicitContent?: boolean
+  referenceUrls?: string[]
+}
+
 export interface CostumePreset {
   id: string
   name: string
@@ -67,6 +77,7 @@ export interface CostumePreset {
   updatedAt: string
   notes?: string
   inspiration?: string
+  aiSettings?: CostumeAiSettings
 }
 
 export interface CostumeCategory {

@@ -58,7 +58,7 @@ async function extractSettingsFromScript(scriptPath: string): Promise<CostumeScr
     
     // Extract costume URLs
     const urlMatches = content.match(/const costumeUrls = \[([^\]]+)\]/s)
-    let costumeUrls: string[] = []
+    const costumeUrls: string[] = []
     
     if (urlMatches) {
       const urlsText = urlMatches[1]

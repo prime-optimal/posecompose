@@ -36,6 +36,7 @@ interface DBCostumeRow {
 	updated_at: string | Date | null
 	notes?: string | null
 	inspiration?: string | null
+	ai_settings?: Record<string, unknown> | null
 }
 
 const getSqlClient = () => {
@@ -91,6 +92,7 @@ const mapCostumeRow = (row: DBCostumeRow, assets: CostumeAsset[]): CostumePreset
 			: row.updated_at?.toISOString?.() ?? new Date().toISOString(),
 	notes: row.notes ?? undefined,
 	inspiration: row.inspiration ?? undefined,
+ 	aiSettings: row.ai_settings ?? undefined,
 })
 
 const fetchAssetsForCostume = async (sql: NeonQueryFunction<false, false>, costumeId: string) => {

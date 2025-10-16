@@ -43,7 +43,7 @@ const extractItems = (payload: unknown): CostumePreset[] | null => {
 
 export const fetchCostumes = async (): Promise<CostumePreset[]> => {
 	try {
-		const payload = await request<unknown>('/api/costumes')
+	const payload = await request<unknown>('/api/costumes')
 		const items = extractItems(payload)
 		if (items && items.length) {
 			return items
@@ -61,10 +61,10 @@ export const fetchCostumes = async (): Promise<CostumePreset[]> => {
 
 export const fetchCostume = async (id: string): Promise<CostumePreset | undefined> => {
 	try {
-		const payload = await request<CostumePreset>(`/api/costumes/${encodeURIComponent(id)}`)
-		if (payload) {
-			return payload
-		}
+	const payload = await request<CostumePreset>(`/api/costumes/${encodeURIComponent(id)}`)
+	if (payload) {
+		return payload
+	}
 	} catch (error) {
 		console.warn(`Costume ${id} not available via API, falling back to local data.`, error)
 	}

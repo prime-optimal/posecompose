@@ -1,6 +1,16 @@
 // Auto-generated costume settings from scripts
 // Generated on: 2025-10-16T05:02:33.932Z
 
+export type AiGenerationSettings = {
+  model?: string
+  prompt?: string
+  steps?: number
+  seed?: number
+  resolution?: 'auto' | '512x512' | '1024x1024'
+  showExplicitContent?: boolean
+  referenceUrls?: string[]
+}
+
 export const EXTRACTED_COSTUME_SETTINGS = {
   "rosalina": {
     "model": "seedream-v4",

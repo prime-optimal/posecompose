@@ -1,8 +1,8 @@
 import {
-	getAllCostumes,
-	getCostumeById,
+	getAllCostumesV2,
+	getCostumeByIdV2,
 	getFeaturedCostumes,
-} from './neon-client.js'
+} from './neon-client-v2.js'
 
 // Load environment variables from root directory
 import { config } from 'dotenv'
@@ -93,19 +93,19 @@ const handleApiRequest = async (url: URL, origin: string) => {
 	}
 
 	if (url.pathname === '/api/costumes') {
-		const costumes = await getAllCostumes()
+	const costumes = await getAllCostumesV2()
 		return jsonResponse({ count: costumes.length, items: costumes }, 200, origin)
 	}
 
 	if (url.pathname === '/api/costumes/featured') {
-		const costumes = await getFeaturedCostumes()
+		const costumes = await getAllCostumesV2()
 		return jsonResponse({ count: costumes.length, items: costumes }, 200, origin)
 	}
 
 	const costumeByIdMatch = url.pathname.match(/^\/api\/costumes\/([a-z0-9-_%@.]+)/i)
 	if (costumeByIdMatch && costumeByIdMatch[1]) {
 		const costumeId = decodeURIComponent(costumeByIdMatch[1])
-		const costume = await getCostumeById(costumeId)
+		const costume = await getCostumeByIdV2(costumeId)
 		if (!costume) {
 			return notFound(origin)
 		}
