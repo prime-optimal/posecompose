@@ -1,3 +1,15 @@
 [dev]
     targetPort = 4000
     port = 8080
+
+# Production redirects to route API calls to Netlify functions
+[[redirects]]
+    from = "/api/*"
+    to = "/.netlify/functions/api/:splat"
+    status = 200
+
+# Handle Netlify function direct access
+[[redirects]]
+    from = "/.netlify/functions/api"
+    to = "/.netlify/functions/api/"
+    status = 200

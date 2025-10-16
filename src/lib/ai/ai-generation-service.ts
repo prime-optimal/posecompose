@@ -2,6 +2,7 @@ import type { CostumePresetV2, CostumeAIGeneration } from '../../types/costume-v
 import type { NanoGptModel, NanoGptReference, NanoGptGenerationRequest } from './nano-gpt-v2'
 import { MODEL_REFERENCE_LIMITS } from './nano-gpt-v2'
 import { HALLOWEEN_COSTUME_SWAP_PROMPT } from './virtual-try-on-prompts'
+import { logEvent } from '../logger'
 
 // Enhanced logging and image saving utilities
 interface GenerationLog {
@@ -78,6 +79,28 @@ export class AIGenerationService {
     // Build prompt using tuned database prompt first, then legacy prompts, then Halloween fallback
     const tunedPrompt = dbAiSettings.prompt || structuredAiSettings.primaryPrompt || structuredAiSettings.fallbackPrompt
     const prompt = overridePrompt || tunedPrompt || HALLOWEEN_COSTUME_SWAP_PROMPT({ costumeName: costume.name, costumeCategory: costume.category })
+
+    // Log which prompt source is being used for debugging
+    let promptSource: 'aiSettings' | 'aiGeneration' | 'fallback' | 'override' = 'fallback'
+    if (overridePrompt) {
+      promptSource = 'override'
+    } else if (dbAiSettings.prompt) {
+      promptSource = 'aiSettings'
+    } else if (structuredAiSettings.primaryPrompt || structuredAiSettings.fallbackPrompt) {
+      promptSource = 'aiGeneration'
+    }
+
+    logEvent('ai_prompt_selected', {
+      source: promptSource,
+      model: selectedModel,
+      seed: overrideSeed ?? dbAiSettings.seed ?? structuredAiSettings.seed,
+      referenceCount: references.length,
+      promptLength: prompt.length,
+      costumeId: costume.id,
+      costumeName: costume.name,
+      hasUserSelfie: !!selfieBase64,
+      referenceStrategy: structuredAiSettings.referenceStrategy ?? 'priority-order',
+    })
 
     // Combine costume settings with any custom options
     const generationOptions: Record<string, unknown> = {
@@ -375,7 +398,7 @@ ${Object.entries(details.generationSettings)
     references.push({
       id: 'fallback-costume',
       kind: 'url',
-      value: 'https://f004.backblazeb2.com/file/waifu-test/waifu-test/costumes/daisy-01.png',
+      value: 'https://f004.backblazeb2.com/file/waifu-test/costumes/daisy-01.png',
       role: 'costume',
     })
 

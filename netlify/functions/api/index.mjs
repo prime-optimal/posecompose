@@ -8,7 +8,7 @@ const resolveHandler = async () => {
         return override;
     }
     if (!cachedHandler) {
-        const module = await import('../../../server/api/index.js');
+        const module = await import('../../../server/api/index.ts');
         cachedHandler = module.default;
     }
     return cachedHandler;

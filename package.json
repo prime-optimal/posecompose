@@ -18,7 +18,9 @@
     "dev:check": "node scripts/check-dev-setup.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "netlify dev:exec drizzle-kit migrate",
-    "db:studio": "netlify dev:exec drizzle-kit studio"
+    "db:studio": "netlify dev:exec drizzle-kit studio",
+    "db:verify": "bun run scripts/verify-production-schema.ts",
+    "test:deployment": "bun run scripts/test-deployment-integration.ts"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

@@ -4,9 +4,11 @@ import {
 	getFeaturedCostumes,
 } from './neon-client-v2.js'
 
-// Load environment variables from root directory
+// Load environment variables from root directory (only for local development)
 import { config } from 'dotenv'
-config({ path: '../.env' })
+if (!process.env.VERCEL && !process.env.NETLIFY) {
+  config({ path: '.env' })
+}
 
 const ALLOW_ORIGIN = process.env.API_ALLOW_ORIGIN ?? '*'
 const LOG_SINK = process.env.LOG_SINK ?? 'stdout'
@@ -98,7 +100,7 @@ const handleApiRequest = async (url: URL, origin: string) => {
 	}
 
 	if (url.pathname === '/api/costumes/featured') {
-		const costumes = await getAllCostumesV2()
+		const costumes = await getFeaturedCostumes()
 		return jsonResponse({ count: costumes.length, items: costumes }, 200, origin)
 	}
 
